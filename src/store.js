@@ -1,4 +1,3 @@
-// src/store.js
 import { configureStore } from "@reduxjs/toolkit";
 import {
   persistStore,
@@ -15,8 +14,10 @@ import { combineReducers } from "redux";
 
 import likesReducer from "./features/likes/likesSlice";
 import cartReducer from "./features/cart/cartSlice";
+import booksReducer from "./features/books/booksSlice";
 
 const rootReducer = combineReducers({
+  books: booksReducer,
   likes: likesReducer,
   cart: cartReducer,
 });
@@ -24,7 +25,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["likes", "cart"], // only these reducers will be persisted
+  whitelist: ["likes", "cart"],
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

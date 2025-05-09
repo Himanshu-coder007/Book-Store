@@ -1,61 +1,61 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
-import { FaSearch, FaHeart, FaRegHeart, FaShoppingCart, FaSpinner } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
-import { toggleLike } from '../features/likes/likesSlice';
-import { toggleCart } from '../features/cart/cartSlice';
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { useSelector, useDispatch } from 'react-redux'
+import axios from 'axios'
+import { FaSearch, FaHeart, FaRegHeart, FaShoppingCart, FaSpinner } from 'react-icons/fa'
+import { motion, AnimatePresence } from 'framer-motion'
+import { toggleLike } from '../features/likes/likesSlice'
+import { toggleCart } from '../features/cart/cartSlice'
+import { setBooks, setLoading, setError } from '../features/books/booksSlice'
 
 const Dashboard = () => {
-  const [books, setBooks] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('javascript')
+  const dispatch = useDispatch()
   
-  const dispatch = useDispatch();
-  const { likedBooks } = useSelector((state) => state.likes);
-  const { cartItems } = useSelector((state) => state.cart);
+  const { books, loading, error } = useSelector((state) => state.books)
+  const { likedBooks } = useSelector((state) => state.likes)
+  const { cartItems } = useSelector((state) => state.cart)
 
-  const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY;
+  const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
 
   const fetchBooks = async (query = 'javascript') => {
-    setLoading(true);
-    setError(null);
+    dispatch(setLoading(true))
+    dispatch(setError(null))
+    
     try {
       const response = await axios.get(
         `https://www.googleapis.com/books/v1/volumes?q=${query}&key=${API_KEY}&maxResults=20`
-      );
-      setBooks(response.data.items || []);
+      )
+      dispatch(setBooks(response.data.items || []))
     } catch (err) {
-      setError('Failed to fetch books. Please try again.');
-      console.error('Error fetching books:', err);
+      dispatch(setError('Failed to fetch books. Please try again.'))
+      console.error('Error fetching books:', err)
     } finally {
-      setLoading(false);
+      dispatch(setLoading(false))
     }
-  };
+  }
 
   useEffect(() => {
-    fetchBooks();
-  }, []);
+    fetchBooks()
+  }, [])
 
   const handleSearch = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (searchQuery.trim()) {
-      fetchBooks(searchQuery);
+      fetchBooks(searchQuery)
     }
-  };
+  }
 
   const handleToggleLike = (bookId) => {
-    dispatch(toggleLike(bookId));
-  };
+    dispatch(toggleLike(bookId))
+  }
 
   const handleToggleCart = (bookId) => {
-    dispatch(toggleCart(bookId));
-  };
+    dispatch(toggleCart(bookId))
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
+    <div className="min-h-screen p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div 
@@ -157,9 +157,9 @@ const Dashboard = () => {
                     <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       <button
                         onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleToggleLike(book.id);
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleToggleLike(book.id)
                         }}
                         className="p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors"
                         aria-label={likedBooks.includes(book.id) ? "Unlike" : "Like"}
@@ -172,9 +172,9 @@ const Dashboard = () => {
                       </button>
                       <button
                         onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleToggleCart(book.id);
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleToggleCart(book.id)
                         }}
                         className={`p-2 bg-white rounded-full shadow-md transition-colors ${
                           cartItems.includes(book.id) 
@@ -268,7 +268,7 @@ const Dashboard = () => {
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard
