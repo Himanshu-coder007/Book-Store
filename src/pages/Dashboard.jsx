@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
-import { FaSearch, FaHeart, FaRegHeart, FaShoppingCart, FaSpinner } from 'react-icons/fa'
+import { FaHeart, FaRegHeart, FaShoppingCart, FaSpinner } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toggleLike } from '../features/likes/likesSlice'
 import { toggleCart } from '../features/cart/cartSlice'
 import { setBooks, setLoading, setError } from '../features/books/booksSlice'
+import Navbar from '../components/Navbar'
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('javascript')
@@ -55,52 +56,15 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8"
-        >
-          <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
-              Book Store
-            </span>
-          </h1>
-          
-          {/* Search Form */}
-          <form onSubmit={handleSearch} className="w-full md:w-auto">
-            <div className="relative flex gap-2">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for books..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all duration-300 w-full md:w-64 lg:w-80"
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg"
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <FaSpinner className="animate-spin" />
-                    <span>Searching</span>
-                  </>
-                ) : (
-                  <>
-                    <FaSearch />
-                    <span>Search</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        </motion.div>
-
+    <div className="min-h-screen">
+      <Navbar 
+        searchQuery={searchQuery} 
+        setSearchQuery={setSearchQuery} 
+        handleSearch={handleSearch} 
+        loading={loading} 
+      />
+      
+      <div className="p-4 md:p-6 max-w-7xl mx-auto">
         {/* Error Message */}
         <AnimatePresence>
           {error && (
@@ -271,4 +235,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default Dashboard;

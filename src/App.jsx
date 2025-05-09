@@ -1,15 +1,13 @@
-import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Dashboard from './pages/Dashboard'
-import BookDetails from './pages/BookDetails'
-import Likes from './components/Likes'
-import Cart from './components/Cart'
-import Navbar from './components/Navbar'
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
+import BookDetails from "./pages/BookDetails";
+import Likes from "./components/Likes";
+import Cart from "./components/Cart";
 
 const App = () => {
   return (
     <Router>
-      <Navbar />
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/book/:id" element={<BookDetails />} />
@@ -17,7 +15,7 @@ const App = () => {
         <Route path="/cart" element={<Cart />} />
       </Routes>
     </Router>
-  )
-}
+  );
+};
 
 export default App;
