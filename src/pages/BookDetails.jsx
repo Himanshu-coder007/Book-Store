@@ -1,18 +1,26 @@
 // pages/BookDetails.jsx
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { FaHeart, FaRegHeart, FaShoppingCart, FaArrowLeft, FaStar, FaExternalLinkAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import DOMPurify from 'dompurify';
+import { toggleLike } from '../features/likes/likesSlice';
+import { toggleCart } from '../features/cart/cartSlice';
 
 const BookDetails = () => {
   const { id } = useParams();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [liked, setLiked] = useState(false);
-  const [inCart, setInCart] = useState(false);
+  
+  const dispatch = useDispatch();
+  const { likedBooks } = useSelector((state) => state.likes);
+  const { cartItems } = useSelector((state) => state.cart);
+  
+  const liked = likedBooks.includes(id);
+  const inCart = cartItems.includes(id);
 
   const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY;
 
@@ -25,13 +33,6 @@ const BookDetails = () => {
           `https://www.googleapis.com/books/v1/volumes/${id}?key=${API_KEY}`
         );
         setBook(response.data);
-        
-        // Check local storage for liked and cart status
-        const likedBooks = JSON.parse(localStorage.getItem('likedBooks')) || [];
-        setLiked(likedBooks.includes(id));
-        
-        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-        setInCart(cartItems.includes(id));
       } catch (err) {
         setError('Failed to fetch book details. Please try again.');
         console.error('Error fetching book:', err);
@@ -43,30 +44,12 @@ const BookDetails = () => {
     fetchBookDetails();
   }, [id]);
 
-  const toggleLike = () => {
-    const newLiked = !liked;
-    setLiked(newLiked);
-    
-    // Update local storage
-    const likedBooks = JSON.parse(localStorage.getItem('likedBooks')) || [];
-    if (newLiked) {
-      localStorage.setItem('likedBooks', JSON.stringify([...likedBooks, id]));
-    } else {
-      localStorage.setItem('likedBooks', JSON.stringify(likedBooks.filter(bookId => bookId !== id)));
-    }
+  const handleToggleLike = () => {
+    dispatch(toggleLike(id));
   };
 
-  const toggleCart = () => {
-    const newInCart = !inCart;
-    setInCart(newInCart);
-    
-    // Update local storage
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    if (newInCart) {
-      localStorage.setItem('cartItems', JSON.stringify([...cartItems, id]));
-    } else {
-      localStorage.setItem('cartItems', JSON.stringify(cartItems.filter(bookId => bookId !== id)));
-    }
+  const handleToggleCart = () => {
+    dispatch(toggleCart(id));
   };
 
   // Function to safely render HTML description
@@ -210,7 +193,7 @@ const BookDetails = () => {
                     <div className="flex gap-3">
                       <motion.button
                         whileTap={{ scale: 0.9 }}
-                        onClick={toggleLike}
+                        onClick={handleToggleLike}
                         className={`p-3 rounded-full transition-colors ${
                           liked ? 'bg-red-50' : 'bg-gray-100 hover:bg-gray-200'
                         }`}
@@ -224,7 +207,7 @@ const BookDetails = () => {
                       </motion.button>
                       <motion.button
                         whileTap={{ scale: 0.9 }}
-                        onClick={toggleCart}
+                        onClick={handleToggleCart}
                         className={`p-3 rounded-full transition-colors ${
                           inCart 
                             ? 'bg-green-100 text-green-600' 
@@ -282,13 +265,7 @@ const BookDetails = () => {
                     <div className="mb-8">
                       <h3 className="text-xl font-semibold text-gray-800 mb-3">Description</h3>
                       <div className="prose max-w-none text-gray-700">
-                        {/* Safe HTML rendering option */}
                         <div dangerouslySetInnerHTML={createMarkup(book.volumeInfo.description)} />
-                        
-                        {/* Plain text option (alternative) */}
-                        {/* <p className="whitespace-pre-line">
-                          {stripHtml(book.volumeInfo.description)}
-                        </p> */}
                       </div>
                     </div>
                   )}
