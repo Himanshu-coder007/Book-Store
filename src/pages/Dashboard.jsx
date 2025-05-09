@@ -10,7 +10,7 @@ import { setBooks, setLoading, setError } from '../features/books/booksSlice'
 import Navbar from '../components/Navbar'
 
 const Dashboard = () => {
-  const [searchQuery, setSearchQuery] = useState('javascript')
+  const [searchQuery, setSearchQuery] = useState('')
   const dispatch = useDispatch()
   
   const { books, loading, error } = useSelector((state) => state.books)
@@ -19,14 +19,16 @@ const Dashboard = () => {
 
   const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
 
-  const fetchBooks = async (query = 'javascript') => {
+  const fetchBooks = async (query = '') => {
     dispatch(setLoading(true))
     dispatch(setError(null))
     
     try {
-      const response = await axios.get(
-        `https://www.googleapis.com/books/v1/volumes?q=${query}&key=${API_KEY}&maxResults=20`
-      )
+      const url = query 
+        ? `https://www.googleapis.com/books/v1/volumes?q=${query}&key=${API_KEY}&maxResults=20`
+        : `https://www.googleapis.com/books/v1/volumes?q=subject:books&key=${API_KEY}&maxResults=20`
+      
+      const response = await axios.get(url)
       dispatch(setBooks(response.data.items || []))
     } catch (err) {
       dispatch(setError('Failed to fetch books. Please try again.'))
@@ -42,9 +44,7 @@ const Dashboard = () => {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    if (searchQuery.trim()) {
-      fetchBooks(searchQuery)
-    }
+    fetchBooks(searchQuery.trim())
   }
 
   const handleToggleLike = (bookId) => {
@@ -223,10 +223,10 @@ const Dashboard = () => {
               Try searching for something else or check your spelling.
             </p>
             <button
-              onClick={() => fetchBooks('javascript')}
+              onClick={() => fetchBooks()}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              Show Popular JavaScript Books
+              Show Popular Books
             </button>
           </motion.div>
         )}
