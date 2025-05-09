@@ -1,26 +1,23 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { FaSearch, FaHeart, FaRegHeart, FaShoppingCart, FaSpinner } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { toggleLike } from '../features/likes/likesSlice';
+import { toggleCart } from '../features/cart/cartSlice';
 
 const Dashboard = () => {
   const [books, setBooks] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [likedBooks, setLikedBooks] = useState([]);
-  const [cartItems, setCartItems] = useState([]);
+  
+  const dispatch = useDispatch();
+  const { likedBooks } = useSelector((state) => state.likes);
+  const { cartItems } = useSelector((state) => state.cart);
 
   const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY;
-
-  // Load liked books and cart items from localStorage on component mount
-  useEffect(() => {
-    const storedLikedBooks = JSON.parse(localStorage.getItem('likedBooks')) || [];
-    const storedCartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-    setLikedBooks(storedLikedBooks);
-    setCartItems(storedCartItems);
-  }, []);
 
   const fetchBooks = async (query = 'javascript') => {
     setLoading(true);
@@ -49,26 +46,12 @@ const Dashboard = () => {
     }
   };
 
-  const toggleLike = (bookId) => {
-    let newLikedBooks;
-    if (likedBooks.includes(bookId)) {
-      newLikedBooks = likedBooks.filter(id => id !== bookId);
-    } else {
-      newLikedBooks = [...likedBooks, bookId];
-    }
-    setLikedBooks(newLikedBooks);
-    localStorage.setItem('likedBooks', JSON.stringify(newLikedBooks));
+  const handleToggleLike = (bookId) => {
+    dispatch(toggleLike(bookId));
   };
 
-  const toggleCart = (bookId) => {
-    let newCartItems;
-    if (cartItems.includes(bookId)) {
-      newCartItems = cartItems.filter(id => id !== bookId);
-    } else {
-      newCartItems = [...cartItems, bookId];
-    }
-    setCartItems(newCartItems);
-    localStorage.setItem('cartItems', JSON.stringify(newCartItems));
+  const handleToggleCart = (bookId) => {
+    dispatch(toggleCart(bookId));
   };
 
   return (
@@ -157,7 +140,7 @@ const Dashboard = () => {
                 whileHover={{ y: -5 }}
                 className="group relative bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300"
               >
-                <Link to={`/${book.id}`} className="block">
+                <Link to={`/book/${book.id}`} className="block">
                   {/* Book Cover */}
                   <div className="h-60 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
                     {book.volumeInfo.imageLinks?.thumbnail ? (
@@ -176,7 +159,7 @@ const Dashboard = () => {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          toggleLike(book.id);
+                          handleToggleLike(book.id);
                         }}
                         className="p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors"
                         aria-label={likedBooks.includes(book.id) ? "Unlike" : "Like"}
@@ -191,7 +174,7 @@ const Dashboard = () => {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          toggleCart(book.id);
+                          handleToggleCart(book.id);
                         }}
                         className={`p-2 bg-white rounded-full shadow-md transition-colors ${
                           cartItems.includes(book.id) 

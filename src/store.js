@@ -1,7 +1,5 @@
 // src/store.js
 import { configureStore } from "@reduxjs/toolkit";
-import counterReducer from "./features/counter/counterSlice";
-
 import {
   persistStore,
   persistReducer,
@@ -12,26 +10,25 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-
-import storage from "redux-persist/lib/storage"; // defaults to localStorage
-
+import storage from "redux-persist/lib/storage";
 import { combineReducers } from "redux";
 
-// Combine reducers if you have multiple
+import likesReducer from "./features/likes/likesSlice";
+import cartReducer from "./features/cart/cartSlice";
+
 const rootReducer = combineReducers({
-  counter: counterReducer,
+  likes: likesReducer,
+  cart: cartReducer,
 });
 
-// Persist config
 const persistConfig = {
   key: "root",
   storage,
+  whitelist: ["likes", "cart"], // only these reducers will be persisted
 };
 
-// Create a persisted reducer
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// Create store
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
@@ -42,5 +39,4 @@ export const store = configureStore({
     }),
 });
 
-// Create persistor
 export const persistor = persistStore(store);
