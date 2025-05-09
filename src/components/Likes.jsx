@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaHeart, FaRegHeart, FaArrowLeft } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { fetchBookById } from '../utils/api';
-import { toggleLike } from '../features/likes/likesSlice'; // Assuming you have this action
+import { toggleLike } from '../features/likes/likesSlice';
 
 const Likes = () => {
   const { likedBooks } = useSelector((state) => state.likes);
@@ -87,9 +87,9 @@ const Likes = () => {
               <motion.div
                 key={book.id}
                 whileHover={{ y: -5 }}
-                className="group relative bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300"
+                className="group relative bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full"
               >
-                <Link to={`/book/${book.id}`} className="block">
+                <Link to={`/book/${book.id}`} className="flex-1 flex flex-col">
                   <div className="h-60 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
                     {book.volumeInfo.imageLinks?.thumbnail ? (
                       <img
@@ -102,16 +102,16 @@ const Likes = () => {
                     )}
                   </div>
                   
-                  <div className="p-4">
-                    <h2 className="font-bold text-lg mb-1 line-clamp-2 text-gray-800">
+                  <div className="p-4 flex-1 flex flex-col">
+                    <h2 className="font-bold text-lg mb-2 line-clamp-2 text-gray-800 min-h-[3.5rem]">
                       {book.volumeInfo.title}
                     </h2>
                     {book.volumeInfo.authors && (
-                      <p className="text-sm text-gray-600 line-clamp-1 mb-2">
+                      <p className="text-sm text-gray-600 line-clamp-1 mb-3">
                         By {book.volumeInfo.authors.join(', ')}
                       </p>
                     )}
-                    <div className="flex justify-between items-center pt-2 border-t border-gray-100 mt-3">
+                    <div className="flex justify-between items-center pt-3 border-t border-gray-100 mt-auto">
                       <span className="text-sm font-medium text-blue-600">
                         {book.volumeInfo.pageCount ? `${book.volumeInfo.pageCount} pages` : 'N/A'}
                       </span>
