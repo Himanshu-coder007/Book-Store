@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { useSelector, useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaHeart, FaRegHeart, FaArrowLeft } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { fetchBookById } from '../utils/api';
+import { toggleLike } from '../features/likes/likesSlice'; // Assuming you have this action
 
 const Likes = () => {
   const { likedBooks } = useSelector((state) => state.likes);
   const [likedBooksData, setLikedBooksData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLikedBooks = async () => {
@@ -33,6 +36,10 @@ const Likes = () => {
     }
   }, [likedBooks]);
 
+  const handleRemoveLike = (bookId) => {
+    dispatch(toggleLike(bookId));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6 flex items-center justify-center">
@@ -49,6 +56,15 @@ const Likes = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-blue-600 hover:text-blue-800 mb-4 transition-colors"
+        >
+          <FaArrowLeft className="mr-2" />
+          Back
+        </button>
+
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -90,11 +106,26 @@ const Likes = () => {
                     <h2 className="font-bold text-lg mb-1 line-clamp-2 text-gray-800">
                       {book.volumeInfo.title}
                     </h2>
+                    {book.volumeInfo.authors && (
+                      <p className="text-sm text-gray-600 line-clamp-1 mb-2">
+                        By {book.volumeInfo.authors.join(', ')}
+                      </p>
+                    )}
                     <div className="flex justify-between items-center pt-2 border-t border-gray-100 mt-3">
                       <span className="text-sm font-medium text-blue-600">
                         {book.volumeInfo.pageCount ? `${book.volumeInfo.pageCount} pages` : 'N/A'}
                       </span>
-                      <FaHeart className="text-red-500" />
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleRemoveLike(book.id);
+                        }}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                        aria-label="Remove from favorites"
+                      >
+                        <FaHeart className="text-red-500" />
+                      </button>
                     </div>
                   </div>
                 </Link>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import { FaShoppingCart, FaTrash } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaShoppingCart, FaTrash, FaArrowLeft } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 import { toggleCart } from '../features/cart/cartSlice';
@@ -10,6 +10,7 @@ import { fetchBookById } from '../utils/api';
 const Cart = () => {
   const { cartItems } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [cartBooks, setCartBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,6 +57,15 @@ const Cart = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
+        {/* Back Navigation Button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center text-blue-600 hover:text-blue-800 mb-4 transition-colors"
+        >
+          <FaArrowLeft className="mr-2" />
+          Back
+        </button>
+
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
