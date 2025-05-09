@@ -41,6 +41,15 @@ const Cart = () => {
     dispatch(toggleCart(bookId));
   };
 
+  // Function to strip HTML tags and truncate description
+  const formatDescription = (html) => {
+    if (!html) return '';
+    // Strip HTML tags
+    const plainText = html.replace(/<[^>]*>?/gm, '');
+    // Truncate to 200 characters if needed
+    return plainText.length > 200 ? `${plainText.substring(0, 200)}...` : plainText;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6 flex items-center justify-center">
@@ -117,8 +126,8 @@ const Cart = () => {
                       </p>
                     )}
                     {book.volumeInfo.description && (
-                      <p className="text-sm text-gray-600 line-clamp-2">
-                        {book.volumeInfo.description}
+                      <p className="text-sm text-gray-600 mb-2">
+                        {formatDescription(book.volumeInfo.description)}
                       </p>
                     )}
                   </div>
