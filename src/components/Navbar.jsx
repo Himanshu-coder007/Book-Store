@@ -1,11 +1,37 @@
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { FaHeart, FaShoppingCart, FaBook, FaSearch } from 'react-icons/fa'
+import { FaHeart, FaShoppingCart, FaBook, FaSearch, FaSpinner } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 
-const Navbar = ({ searchQuery, setSearchQuery, handleSearch, loading }) => {
+const Navbar = ({ 
+  searchQuery, 
+  setSearchQuery, 
+  handleSearch, 
+  loading,
+  suggestions,
+  showSuggestions,
+  suggestionsLoading,
+  handleSuggestionClick,
+  setShowSuggestions
+}) => {
   const { likedBooks } = useSelector((state) => state.likes)
   const { cartItems } = useSelector((state) => state.cart)
+  const searchRef = useRef(null)
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setShowSuggestions(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [searchRef, setShowSuggestions])
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-10">
@@ -22,12 +48,18 @@ const Navbar = ({ searchQuery, setSearchQuery, handleSearch, loading }) => {
           </div>
           
           {/* Search Form */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-4">
-            <div className="relative flex gap-2">
+          <div className="flex-1 max-w-xl mx-4 relative" ref={searchRef}>
+            <form onSubmit={handleSearch} className="relative flex gap-2">
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  if (e.target.value.trim()) {
+                    setShowSuggestions(true)
+                  }
+                }}
+                onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
                 placeholder="Search for books..."
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all duration-300 w-full"
               />
@@ -38,8 +70,61 @@ const Navbar = ({ searchQuery, setSearchQuery, handleSearch, loading }) => {
               >
                 <FaSearch />
               </button>
-            </div>
-          </form>
+            </form>
+
+            {/* Suggestions Dropdown */}
+            <AnimatePresence>
+              {showSuggestions && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute z-20 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-80 overflow-y-auto"
+                >
+                  {suggestionsLoading ? (
+                    <div className="p-4 flex justify-center">
+                      <FaSpinner className="animate-spin text-blue-500" />
+                    </div>
+                  ) : suggestions.length > 0 ? (
+                    <ul>
+                      {suggestions.map((suggestion) => (
+                        <li 
+                          key={suggestion.id}
+                          className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors"
+                          onClick={() => handleSuggestionClick(suggestion)}
+                        >
+                          <div className="flex items-center">
+                            {suggestion.volumeInfo.imageLinks?.thumbnail && (
+                              <img 
+                                src={suggestion.volumeInfo.imageLinks.thumbnail.replace('http://', 'https://')}
+                                alt={suggestion.volumeInfo.title}
+                                className="w-10 h-14 object-contain mr-3"
+                              />
+                            )}
+                            <div>
+                              <p className="font-medium text-gray-800 line-clamp-1">
+                                {suggestion.volumeInfo.title}
+                              </p>
+                              {suggestion.volumeInfo.authors && (
+                                <p className="text-xs text-gray-500 line-clamp-1">
+                                  {suggestion.volumeInfo.authors.join(', ')}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="p-4 text-gray-500 text-center">
+                      No suggestions found
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           
           <div className="flex items-center space-x-4">
             <Link 
@@ -80,4 +165,4 @@ const Navbar = ({ searchQuery, setSearchQuery, handleSearch, loading }) => {
   )
 }
 
-export default Navbar;
+export default Navbar

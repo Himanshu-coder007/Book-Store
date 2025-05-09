@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
-import { FaHeart, FaRegHeart, FaShoppingCart, FaSpinner } from 'react-icons/fa'
+import { FaHeart, FaRegHeart, FaShoppingCart, FaSpinner, FaTimes } from 'react-icons/fa'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toggleLike } from '../features/likes/likesSlice'
 import { toggleCart } from '../features/cart/cartSlice'
@@ -11,6 +11,9 @@ import Navbar from '../components/Navbar'
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('')
+  const [suggestions, setSuggestions] = useState([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false)
   const dispatch = useDispatch()
   
   const { books, loading, error } = useSelector((state) => state.books)
@@ -22,6 +25,7 @@ const Dashboard = () => {
   const fetchBooks = async (query = '') => {
     dispatch(setLoading(true))
     dispatch(setError(null))
+    setShowSuggestions(false) // Hide suggestions when performing full search
     
     try {
       const url = query 
@@ -38,6 +42,42 @@ const Dashboard = () => {
     }
   }
 
+  const fetchSuggestions = async (query) => {
+    if (!query.trim()) {
+      setSuggestions([])
+      setShowSuggestions(false)
+      return
+    }
+
+    setSuggestionsLoading(true)
+    
+    try {
+      const response = await axios.get(
+        `https://www.googleapis.com/books/v1/volumes?q=${query}&key=${API_KEY}&maxResults=5`
+      )
+      setSuggestions(response.data.items || [])
+      setShowSuggestions(true)
+    } catch (err) {
+      console.error('Error fetching suggestions:', err)
+      setSuggestions([])
+    } finally {
+      setSuggestionsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      if (searchQuery.trim()) {
+        fetchSuggestions(searchQuery)
+      } else {
+        setSuggestions([])
+        setShowSuggestions(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(debounceTimer)
+  }, [searchQuery])
+
   useEffect(() => {
     fetchBooks()
   }, [])
@@ -45,6 +85,12 @@ const Dashboard = () => {
   const handleSearch = (e) => {
     e.preventDefault()
     fetchBooks(searchQuery.trim())
+  }
+
+  const handleSuggestionClick = (suggestion) => {
+    setSearchQuery(suggestion.volumeInfo.title)
+    fetchBooks(suggestion.volumeInfo.title)
+    setShowSuggestions(false)
   }
 
   const handleToggleLike = (bookId) => {
@@ -61,7 +107,12 @@ const Dashboard = () => {
         searchQuery={searchQuery} 
         setSearchQuery={setSearchQuery} 
         handleSearch={handleSearch} 
-        loading={loading} 
+        loading={loading}
+        suggestions={suggestions}
+        showSuggestions={showSuggestions}
+        suggestionsLoading={suggestionsLoading}
+        handleSuggestionClick={handleSuggestionClick}
+        setShowSuggestions={setShowSuggestions}
       />
       
       <div className="p-4 md:p-6 max-w-7xl mx-auto">
