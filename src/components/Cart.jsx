@@ -1,20 +1,57 @@
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FaShoppingCart, FaTrash } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 import { toggleCart } from '../features/cart/cartSlice';
+import { fetchBookById } from '../utils/api';
 
 const Cart = () => {
   const { cartItems } = useSelector((state) => state.cart);
-  const books = useSelector((state) => state.books.books);
   const dispatch = useDispatch();
+  const [cartBooks, setCartBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const cartBooksData = books.filter(book => cartItems.includes(book.id));
+  useEffect(() => {
+    const fetchCartBooks = async () => {
+      try {
+        setLoading(true);
+        const booksData = await Promise.all(
+          cartItems.map(id => fetchBookById(id))
+        );
+        setCartBooks(booksData.filter(book => book !== null));
+      } catch (error) {
+        console.error('Error fetching cart books:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (cartItems.length > 0) {
+      fetchCartBooks();
+    } else {
+      setCartBooks([]);
+      setLoading(false);
+    }
+  }, [cartItems]);
 
   const handleRemoveFromCart = (bookId) => {
     dispatch(toggleCart(bookId));
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block p-6">
+            <FaShoppingCart className="w-16 h-16 mx-auto text-gray-400 animate-pulse" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-700 mb-2">Loading your cart...</h3>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
@@ -31,13 +68,13 @@ const Cart = () => {
             </span>
           </h1>
           <p className="text-gray-600 mt-2">
-            {cartBooksData.length} {cartBooksData.length === 1 ? 'item' : 'items'} in cart
+            {cartBooks.length} {cartBooks.length === 1 ? 'item' : 'items'} in cart
           </p>
         </motion.div>
 
-        {cartBooksData.length > 0 ? (
+        {cartBooks.length > 0 ? (
           <div className="grid grid-cols-1 gap-6">
-            {cartBooksData.map((book) => (
+            {cartBooks.map((book) => (
               <motion.div
                 key={book.id}
                 whileHover={{ scale: 1.01 }}
@@ -97,7 +134,7 @@ const Cart = () => {
               className="bg-white rounded-xl shadow-md p-6 mt-6"
             >
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-800">Total Items: {cartBooksData.length}</h3>
+                <h3 className="text-lg font-semibold text-gray-800">Total Items: {cartBooks.length}</h3>
                 <button className="px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 transition-all duration-300">
                   Proceed to Checkout
                 </button>

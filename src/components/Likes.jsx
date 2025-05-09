@@ -1,13 +1,50 @@
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { fetchBookById } from '../utils/api';
 
 const Likes = () => {
   const { likedBooks } = useSelector((state) => state.likes);
-  const books = useSelector((state) => state.books.books);
+  const [likedBooksData, setLikedBooksData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const likedBooksData = books.filter(book => likedBooks.includes(book.id));
+  useEffect(() => {
+    const fetchLikedBooks = async () => {
+      try {
+        setLoading(true);
+        const booksData = await Promise.all(
+          likedBooks.map(id => fetchBookById(id))
+        );
+        setLikedBooksData(booksData.filter(book => book !== null));
+      } catch (error) {
+        console.error('Error fetching liked books:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (likedBooks.length > 0) {
+      fetchLikedBooks();
+    } else {
+      setLikedBooksData([]);
+      setLoading(false);
+    }
+  }, [likedBooks]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block p-6">
+            <FaHeart className="w-16 h-16 mx-auto text-gray-400 animate-pulse" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-700 mb-2">Loading your favorites...</h3>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 md:p-6">
