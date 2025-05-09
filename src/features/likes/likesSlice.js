@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  likedBooks: JSON.parse(localStorage.getItem("likedBooks")) || [],
+  likedBooks: [],
 };
 
 const likesSlice = createSlice({
@@ -15,14 +15,15 @@ const likesSlice = createSlice({
       } else {
         state.likedBooks.push(bookId);
       }
-      localStorage.setItem("likedBooks", JSON.stringify(state.likedBooks));
     },
     clearLikes: (state) => {
       state.likedBooks = [];
-      localStorage.removeItem("likedBooks");
+    },
+    initializeLikes: (state, action) => {
+      state.likedBooks = action.payload || [];
     },
   },
 });
 
-export const { toggleLike, clearLikes } = likesSlice.actions;
+export const { toggleLike, clearLikes, initializeLikes } = likesSlice.actions;
 export default likesSlice.reducer;
