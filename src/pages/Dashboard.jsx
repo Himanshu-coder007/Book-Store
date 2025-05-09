@@ -102,9 +102,9 @@ const Dashboard = () => {
               <motion.div
                 key={book.id}
                 whileHover={{ y: -5 }}
-                className="group relative bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300"
+                className="group relative bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col"
               >
-                <Link to={`/book/${book.id}`} className="block">
+                <Link to={`/book/${book.id}`} className="flex-1 flex flex-col">
                   {/* Book Cover */}
                   <div className="h-60 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
                     {book.volumeInfo.imageLinks?.thumbnail ? (
@@ -153,13 +153,13 @@ const Dashboard = () => {
                   </div>
                   
                   {/* Book Info */}
-                  <div className="p-4">
-                    <h2 className="font-bold text-lg mb-1 line-clamp-2 text-gray-800">
+                  <div className="p-4 flex-1 flex flex-col">
+                    <h2 className="font-bold text-lg mb-2 line-clamp-2 text-gray-800 min-h-[3.5rem]">
                       {book.volumeInfo.title}
                     </h2>
                     
                     {/* Hidden Details (shown on hover) */}
-                    <div className="max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-500">
+                    <div className="flex-1 max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-500">
                       {book.volumeInfo.authors?.length > 0 && (
                         <p className="text-sm text-gray-600 mb-2">
                           <span className="font-semibold">By:</span> {book.volumeInfo.authors.join(', ')}
@@ -180,11 +180,11 @@ const Dashboard = () => {
                     </div>
                     
                     {/* Always visible footer */}
-                    <div className="flex justify-between items-center pt-2 border-t border-gray-100 mt-3">
+                    <div className="flex justify-between items-center pt-3 border-t border-gray-100 mt-auto">
                       <span className="text-sm font-medium text-blue-600">
                         {book.volumeInfo.pageCount ? `${book.volumeInfo.pageCount} pages` : 'N/A'}
                       </span>
-                      <span className="text-xs font-medium text-purple-600">
+                      <span className="text-sm font-medium text-purple-600">
                         Details
                       </span>
                     </div>
@@ -235,4 +235,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard;
+export default Dashboard
