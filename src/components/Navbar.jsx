@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
-import { FaHeart, FaShoppingCart, FaBook, FaSearch, FaSpinner } from 'react-icons/fa'
+import { Link, useNavigate } from 'react-router-dom'
+import { FaHeart, FaShoppingCart, FaBook, FaSearch, FaSpinner, FaUser, FaSignOutAlt } from 'react-icons/fa'
 import { useSelector } from 'react-redux'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -18,6 +18,13 @@ const Navbar = ({
   const { likedBooks } = useSelector((state) => state.likes)
   const { cartItems } = useSelector((state) => state.cart)
   const searchRef = useRef(null)
+  const navigate = useNavigate()
+  const user = JSON.parse(localStorage.getItem('user'))
+
+  const handleLogout = () => {
+    localStorage.removeItem('user')
+    navigate('/login')
+  }
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -127,6 +134,27 @@ const Navbar = ({
           </div>
           
           <div className="flex items-center space-x-4">
+            {user ? (
+              <>
+                <span className="flex items-center text-gray-600">
+                  <FaUser className="mr-1" /> {user.name}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center p-2 text-gray-600 hover:text-red-500 transition-colors"
+                >
+                  <FaSignOutAlt className="h-5 w-5" />
+                </button>
+              </>
+            ) : (
+              <Link 
+                to="/login" 
+                className="px-3 py-1 text-blue-600 hover:text-blue-800 transition-colors"
+              >
+                Login
+              </Link>
+            )}
+            
             <Link 
               to="/likes" 
               className="relative p-2 text-gray-600 hover:text-red-500 transition-colors"
