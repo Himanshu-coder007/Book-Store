@@ -4,6 +4,7 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { FaHeart, FaRegHeart, FaShoppingCart, FaArrowLeft, FaStar, FaExternalLinkAlt } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import DOMPurify from 'dompurify';
 
 const BookDetails = () => {
   const { id } = useParams();
@@ -68,6 +69,40 @@ const BookDetails = () => {
     }
   };
 
+  // Function to safely render HTML description
+  const createMarkup = (html) => {
+    return {
+      __html: DOMPurify.sanitize(html)
+    };
+  };
+
+  // Function to strip HTML tags (alternative)
+  const stripHtml = (html) => {
+    return html.replace(/<[^>]*>?/gm, '');
+  };
+
+  // Function to render star ratings
+  const renderRatingStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<FaStar key={`full-${i}`} className="text-yellow-400" />);
+    }
+    
+    if (hasHalfStar) {
+      stars.push(<FaStar key="half" className="text-yellow-400 opacity-50" />);
+    }
+    
+    const emptyStars = 5 - stars.length;
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(<FaStar key={`empty-${i}`} className="text-gray-300" />);
+    }
+    
+    return stars;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
@@ -113,28 +148,6 @@ const BookDetails = () => {
       </div>
     );
   }
-
-  // Function to render star ratings
-  const renderRatingStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={`full-${i}`} className="text-yellow-400" />);
-    }
-    
-    if (hasHalfStar) {
-      stars.push(<FaStar key="half" className="text-yellow-400 opacity-50" />);
-    }
-    
-    const emptyStars = 5 - stars.length;
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(<FaStar key={`empty-${i}`} className="text-gray-300" />);
-    }
-    
-    return stars;
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 px-4 sm:px-6 lg:px-8">
@@ -269,9 +282,13 @@ const BookDetails = () => {
                     <div className="mb-8">
                       <h3 className="text-xl font-semibold text-gray-800 mb-3">Description</h3>
                       <div className="prose max-w-none text-gray-700">
-                        <p className="whitespace-pre-line">
-                          {book.volumeInfo.description}
-                        </p>
+                        {/* Safe HTML rendering option */}
+                        <div dangerouslySetInnerHTML={createMarkup(book.volumeInfo.description)} />
+                        
+                        {/* Plain text option (alternative) */}
+                        {/* <p className="whitespace-pre-line">
+                          {stripHtml(book.volumeInfo.description)}
+                        </p> */}
                       </div>
                     </div>
                   )}
