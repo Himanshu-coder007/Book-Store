@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaShoppingCart, FaTrash, FaArrowLeft } from 'react-icons/fa';
+import { FaShoppingCart, FaTrash, FaArrowLeft, FaPlus, FaMinus } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { useDispatch } from 'react-redux';
 import { toggleCart } from '../features/cart/cartSlice';
@@ -13,6 +13,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const [cartBooks, setCartBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [quantities, setQuantities] = useState({});
 
   useEffect(() => {
     const fetchCartBooks = async () => {
@@ -21,7 +22,15 @@ const Cart = () => {
         const booksData = await Promise.all(
           cartItems.map(id => fetchBookById(id))
         );
-        setCartBooks(booksData.filter(book => book !== null));
+        const filteredBooks = booksData.filter(book => book !== null);
+        setCartBooks(filteredBooks);
+        
+        // Initialize quantities
+        const initialQuantities = {};
+        filteredBooks.forEach(book => {
+          initialQuantities[book.id] = quantities[book.id] || 1;
+        });
+        setQuantities(initialQuantities);
       } catch (error) {
         console.error('Error fetching cart books:', error);
       } finally {
@@ -33,12 +42,40 @@ const Cart = () => {
       fetchCartBooks();
     } else {
       setCartBooks([]);
+      setQuantities({});
       setLoading(false);
     }
   }, [cartItems]);
 
   const handleRemoveFromCart = (bookId) => {
     dispatch(toggleCart(bookId));
+    // Remove the quantity for the deleted book
+    const newQuantities = {...quantities};
+    delete newQuantities[bookId];
+    setQuantities(newQuantities);
+  };
+
+  const handleQuantityChange = (bookId, newQuantity) => {
+    if (newQuantity < 1) return;
+    if (newQuantity > 10) return;
+    setQuantities(prev => ({
+      ...prev,
+      [bookId]: newQuantity
+    }));
+  };
+
+  // Function to generate a random price between 5 and 50 for a book
+  const getBookPrice = (bookId) => {
+    // Use bookId as seed for consistent pricing
+    const hash = bookId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return 5 + (hash % 45); // Price between 5 and 50
+  };
+
+  // Calculate total price
+  const calculateTotal = () => {
+    return cartBooks.reduce((total, book) => {
+      return total + (getBookPrice(book.id) * (quantities[book.id] || 1));
+    }, 0);
   };
 
   // Function to strip HTML tags and truncate description
@@ -133,9 +170,36 @@ const Cart = () => {
                   </div>
                   
                   <div className="flex justify-between items-center pt-2 border-t border-gray-100 mt-3">
-                    <span className="text-sm font-medium text-green-600">
-                      {book.volumeInfo.pageCount ? `${book.volumeInfo.pageCount} pages` : 'N/A'}
-                    </span>
+                    <div className="flex items-center space-x-4">
+                      <span className="text-lg font-bold text-green-600">
+                        ${getBookPrice(book.id).toFixed(2)}
+                      </span>
+                      
+                      <div className="flex items-center border border-gray-300 rounded-lg">
+                        <button
+                          onClick={() => handleQuantityChange(book.id, (quantities[book.id] || 1) - 1)}
+                          className="px-2 py-1 text-gray-600 hover:bg-gray-100"
+                          disabled={(quantities[book.id] || 1) <= 1}
+                        >
+                          <FaMinus size={12} />
+                        </button>
+                        <span className="px-3 py-1 text-gray-800">
+                          {quantities[book.id] || 1}
+                        </span>
+                        <button
+                          onClick={() => handleQuantityChange(book.id, (quantities[book.id] || 1) + 1)}
+                          className="px-2 py-1 text-gray-600 hover:bg-gray-100"
+                          disabled={(quantities[book.id] || 1) >= 10}
+                        >
+                          <FaPlus size={12} />
+                        </button>
+                      </div>
+                      
+                      <span className="text-sm font-medium text-gray-600">
+                        ${(getBookPrice(book.id) * (quantities[book.id] || 1)).toFixed(2)}
+                      </span>
+                    </div>
+                    
                     <button
                       onClick={() => handleRemoveFromCart(book.id)}
                       className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors"
@@ -152,8 +216,15 @@ const Cart = () => {
               whileHover={{ scale: 1.01 }}
               className="bg-white rounded-xl shadow-md p-6 mt-6"
             >
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-800">Total Items: {cartBooks.length}</h3>
+              <div className="flex flex-col md:flex-row justify-between items-center">
+                <div className="mb-4 md:mb-0">
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Total Items: {cartBooks.reduce((acc, book) => acc + (quantities[book.id] || 1), 0)}
+                  </h3>
+                  <h3 className="text-xl font-bold text-green-600 mt-2">
+                    Total Price: ${calculateTotal().toFixed(2)}
+                  </h3>
+                </div>
                 <button className="px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-lg hover:from-green-700 hover:to-teal-700 transition-all duration-300">
                   Proceed to Checkout
                 </button>
