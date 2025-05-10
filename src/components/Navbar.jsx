@@ -41,15 +41,15 @@ const Navbar = ({
   }, [searchRef, setShowSuggestions])
 
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-10">
+    <nav className="bg-black shadow-sm sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
             <Link 
               to="/" 
-              className="flex items-center text-xl font-bold text-gray-800"
+              className="flex items-center text-xl font-bold text-white hover:text-gray-300 transition-colors"
             >
-              <FaBook className="mr-2 text-blue-600" />
+              <FaBook className="mr-2 text-blue-400" />
               BookStore
             </Link>
           </div>
@@ -68,7 +68,7 @@ const Navbar = ({
                 }}
                 onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
                 placeholder="Search for books..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all duration-300 w-full"
+                className="flex-1 px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all duration-300 w-full bg-gray-800 text-white placeholder-gray-400"
               />
               <button
                 type="submit"
@@ -87,18 +87,18 @@ const Navbar = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute z-20 mt-1 w-full bg-white rounded-lg shadow-lg border border-gray-200 max-h-80 overflow-y-auto"
+                  className="absolute z-20 mt-1 w-full bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-h-80 overflow-y-auto"
                 >
                   {suggestionsLoading ? (
                     <div className="p-4 flex justify-center">
-                      <FaSpinner className="animate-spin text-blue-500" />
+                      <FaSpinner className="animate-spin text-blue-400" />
                     </div>
                   ) : suggestions.length > 0 ? (
                     <ul>
                       {suggestions.map((suggestion) => (
                         <li 
                           key={suggestion.id}
-                          className="px-4 py-3 hover:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0 transition-colors"
+                          className="px-4 py-3 hover:bg-gray-700 cursor-pointer border-b border-gray-700 last:border-b-0 transition-colors"
                           onClick={() => handleSuggestionClick(suggestion)}
                         >
                           <div className="flex items-center">
@@ -110,11 +110,11 @@ const Navbar = ({
                               />
                             )}
                             <div>
-                              <p className="font-medium text-gray-800 line-clamp-1">
+                              <p className="font-medium text-white line-clamp-1">
                                 {suggestion.volumeInfo.title}
                               </p>
                               {suggestion.volumeInfo.authors && (
-                                <p className="text-xs text-gray-500 line-clamp-1">
+                                <p className="text-xs text-gray-400 line-clamp-1">
                                   {suggestion.volumeInfo.authors.join(', ')}
                                 </p>
                               )}
@@ -124,7 +124,7 @@ const Navbar = ({
                       ))}
                     </ul>
                   ) : (
-                    <div className="p-4 text-gray-500 text-center">
+                    <div className="p-4 text-gray-400 text-center">
                       No suggestions found
                     </div>
                   )}
@@ -136,12 +136,13 @@ const Navbar = ({
           <div className="flex items-center space-x-4">
             {user ? (
               <>
-                <span className="flex items-center text-gray-600">
+                <span className="flex items-center text-gray-300">
                   <FaUser className="mr-1" /> {user.name}
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="flex items-center p-2 text-gray-600 hover:text-red-500 transition-colors"
+                  className="flex items-center p-2 text-gray-300 hover:text-red-400 transition-colors"
+                  title="Logout"
                 >
                   <FaSignOutAlt className="h-5 w-5" />
                 </button>
@@ -149,7 +150,7 @@ const Navbar = ({
             ) : (
               <Link 
                 to="/login" 
-                className="px-3 py-1 text-blue-600 hover:text-blue-800 transition-colors"
+                className="px-3 py-1 text-blue-400 hover:text-blue-300 transition-colors"
               >
                 Login
               </Link>
@@ -157,7 +158,8 @@ const Navbar = ({
             
             <Link 
               to="/likes" 
-              className="relative p-2 text-gray-600 hover:text-red-500 transition-colors"
+              className="relative p-2 text-gray-300 hover:text-red-400 transition-colors"
+              title="Favorites"
             >
               <FaHeart className="h-5 w-5" />
               {likedBooks.length > 0 && (
@@ -173,7 +175,8 @@ const Navbar = ({
             
             <Link 
               to="/cart" 
-              className="relative p-2 text-gray-600 hover:text-green-600 transition-colors"
+              className="relative p-2 text-gray-300 hover:text-green-400 transition-colors"
+              title="Cart"
             >
               <FaShoppingCart className="h-5 w-5" />
               {cartItems.length > 0 && (
