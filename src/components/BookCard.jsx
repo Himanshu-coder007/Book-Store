@@ -1,112 +1,143 @@
-import { Link } from 'react-router-dom'
-import { FaHeart, FaRegHeart, FaShoppingCart } from 'react-icons/fa'
-import { motion } from 'framer-motion'
-import { useSelector, useDispatch } from 'react-redux'
-import { toggleLike } from '../features/likes/likesSlice'
-import { toggleCart } from '../features/cart/cartSlice'
+import { Link } from 'react-router-dom';
+import { FaHeart, FaRegHeart, FaShoppingCart } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleLike } from '../features/likes/likesSlice';
+import { toggleCart } from '../features/cart/cartSlice';
 
 const BookCard = ({ book }) => {
-  const dispatch = useDispatch()
-  const { likedBooks } = useSelector((state) => state.likes)
-  const { cartItems } = useSelector((state) => state.cart)
+  const dispatch = useDispatch();
+  const { likedBooks } = useSelector((state) => state.likes);
+  const { cartItems } = useSelector((state) => state.cart);
 
   const handleToggleLike = (e, bookId) => {
-    e.preventDefault()
-    e.stopPropagation()
-    dispatch(toggleLike(bookId))
-  }
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(toggleLike(bookId));
+  };
 
   const handleToggleCart = (e, bookId) => {
-    e.preventDefault()
-    e.stopPropagation()
-    dispatch(toggleCart(bookId))
-  }
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(toggleCart(bookId));
+  };
+
+  const publishedYear = book.volumeInfo.publishedDate 
+    ? new Date(book.volumeInfo.publishedDate).getFullYear()
+    : null;
 
   return (
     <motion.div
-      whileHover={{ y: -5 }}
-      className="group relative bg-gray-900 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col border border-gray-800"
+      whileHover={{ y: -8 }}
+      transition={{ type: 'spring', stiffness: 300 }}
+      className="relative group h-full"
     >
-      <Link to={`/book/${book.id}`} className="flex-1 flex flex-col">
-        {/* Book Cover */}
-        <div className="h-60 bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative overflow-hidden">
-          {book.volumeInfo.imageLinks?.thumbnail ? (
-            <img
-              src={book.volumeInfo.imageLinks.thumbnail.replace('http://', 'https://')}
-              alt={book.volumeInfo.title}
-              className="h-full object-contain transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <span className="text-gray-500">No image available</span>
-          )}
+      <motion.div
+        initial={false}
+        animate={{ scale: 1 }}
+        whileHover={{ scale: 1.05 }}
+        transition={{ duration: 0.3 }}
+        className="relative z-10 bg-gradient-to-br from-purple-900 via-purple-800 to-purple-700 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col border border-purple-800 overflow-hidden h-full"
+      >
+        <Link to={`/book/${book.id}`} className="flex-1 flex flex-col h-full">
+          {/* Book Cover */}
+          <div className="h-64 relative overflow-hidden">
+            {book.volumeInfo.imageLinks?.thumbnail ? (
+              <motion.img
+                src={book.volumeInfo.imageLinks.thumbnail.replace('http://', 'https://')}
+                alt={book.volumeInfo.title}
+                className="w-full h-full object-cover"
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.5 }}
+              />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-purple-800 to-purple-900 flex items-center justify-center">
+                <span className="text-purple-300">No cover available</span>
+              </div>
+            )}
+            
+            {/* Action Buttons */}
+            <div className="absolute top-4 right-4 flex gap-2">
+              <button
+                onClick={(e) => handleToggleLike(e, book.id)}
+                className={`p-3 rounded-full backdrop-blur-sm transition-all ${
+                  likedBooks.includes(book.id)
+                    ? 'bg-pink-500/90 text-white'
+                    : 'bg-purple-900/80 text-purple-200 hover:bg-pink-500/20'
+                }`}
+                aria-label={likedBooks.includes(book.id) ? "Unlike" : "Like"}
+              >
+                {likedBooks.includes(book.id) ? (
+                  <FaHeart className="text-current" />
+                ) : (
+                  <FaRegHeart className="text-current" />
+                )}
+              </button>
+              <button
+                onClick={(e) => handleToggleCart(e, book.id)}
+                className={`p-3 rounded-full backdrop-blur-sm transition-all ${
+                  cartItems.includes(book.id)
+                    ? 'bg-purple-500/90 text-white'
+                    : 'bg-purple-900/80 text-purple-200 hover:bg-purple-500/20'
+                }`}
+                aria-label={cartItems.includes(book.id) ? "In cart" : "Add to cart"}
+              >
+                <FaShoppingCart className="text-current" />
+              </button>
+            </div>
+            
+            {/* Year Badge */}
+            {publishedYear && (
+              <div className="absolute bottom-4 left-4 bg-purple-900/80 text-purple-100 text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                {publishedYear}
+              </div>
+            )}
+          </div>
           
-          {/* Quick Actions */}
-          <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button
-              onClick={(e) => handleToggleLike(e, book.id)}
-              className="p-2 bg-gray-800 rounded-full shadow-md hover:bg-red-900/50 transition-colors"
-              aria-label={likedBooks.includes(book.id) ? "Unlike" : "Like"}
-            >
-              {likedBooks.includes(book.id) ? (
-                <FaHeart className="text-red-500" />
+          {/* Book Info */}
+          <div className="p-5 flex-1 flex flex-col min-h-[180px]">
+            <h2 className="font-bold text-xl mb-2 line-clamp-2 bg-gradient-to-r from-purple-200 to-purple-100 bg-clip-text text-transparent">
+              {book.volumeInfo.title}
+            </h2>
+            
+            <div className="min-h-[40px]">
+              {book.volumeInfo.authors?.length > 0 ? (
+                <p className="text-sm text-purple-200 mb-3 font-medium">
+                  by {book.volumeInfo.authors.join(', ')}
+                </p>
               ) : (
-                <FaRegHeart className="text-gray-400" />
+                <p className="text-sm text-transparent mb-3 font-medium">-</p>
               )}
-            </button>
-            <button
-              onClick={(e) => handleToggleCart(e, book.id)}
-              className={`p-2 bg-gray-800 rounded-full shadow-md transition-colors ${
-                cartItems.includes(book.id) 
-                  ? 'text-green-500' 
-                  : 'text-gray-400 hover:bg-blue-900/50'
-              }`}
-              aria-label={cartItems.includes(book.id) ? "In cart" : "Add to cart"}
-            >
-              <FaShoppingCart />
-            </button>
-          </div>
-        </div>
-        
-        {/* Book Info */}
-        <div className="p-4 flex-1 flex flex-col">
-          <h2 className="font-bold text-lg mb-2 line-clamp-2 text-gray-100 min-h-[3.5rem]">
-            {book.volumeInfo.title}
-          </h2>
-          
-          {/* Hidden Details (shown on hover) */}
-          <div className="flex-1 max-h-0 overflow-hidden group-hover:max-h-40 transition-all duration-500">
-            {book.volumeInfo.authors?.length > 0 && (
-              <p className="text-sm text-gray-400 mb-2">
-                <span className="font-semibold text-gray-300">By:</span> {book.volumeInfo.authors.join(', ')}
-              </p>
-            )}
+            </div>
             
-            {book.volumeInfo.publishedDate && (
-              <p className="text-xs text-gray-500 mb-2">
-                <span className="font-semibold text-gray-400">Published:</span> {new Date(book.volumeInfo.publishedDate).toLocaleDateString()}
-              </p>
-            )}
-            
-            {book.volumeInfo.description && (
-              <p className="text-xs text-gray-400 line-clamp-3 mb-3">
-                {book.volumeInfo.description}
-              </p>
-            )}
+            <div className="flex items-center justify-between mt-auto pt-3">
+              {book.volumeInfo.pageCount && (
+                <span className="text-xs font-medium px-2 py-1 bg-purple-800/50 rounded-full text-purple-100">
+                  {book.volumeInfo.pageCount} pages
+                </span>
+              )}
+              <span className="text-sm font-medium text-purple-300 hover:underline flex items-center">
+                Details <span className="ml-1">→</span>
+              </span>
+            </div>
           </div>
-          
-          {/* Always visible footer */}
-          <div className="flex justify-between items-center pt-3 border-t border-gray-800 mt-auto">
-            <span className="text-sm font-medium text-blue-400">
-              {book.volumeInfo.pageCount ? `${book.volumeInfo.pageCount} pages` : 'N/A'}
-            </span>
-            <span className="text-sm font-medium text-purple-400">
-              Details
-            </span>
-          </div>
-        </div>
-      </Link>
-    </motion.div>
-  )
-}
+        </Link>
+      </motion.div>
 
-export default BookCard
+      {/* Popup Shadow Effect */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 0 }}
+        whileHover={{ 
+          opacity: 0.2,
+          scale: 1.1,
+          y: 20
+        }}
+        transition={{ duration: 0.3 }}
+        className="absolute inset-0 bg-purple-900 rounded-2xl -z-10"
+      />
+    </motion.div>
+  );
+};
+
+export default BookCard;

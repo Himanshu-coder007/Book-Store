@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { setBooks, setLoading, setError } from '../features/books/booksSlice'
 import Navbar from '../components/Navbar'
 import BookCard from '../components/BookCard'
+import HeroSlider from '../components/HeroSlider'
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -88,20 +89,27 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-gray-100">
-      <Navbar 
-        searchQuery={searchQuery} 
-        setSearchQuery={setSearchQuery} 
-        handleSearch={handleSearch} 
-        loading={loading}
-        suggestions={suggestions}
-        showSuggestions={showSuggestions}
-        suggestionsLoading={suggestionsLoading}
-        handleSuggestionClick={handleSuggestionClick}
-        setShowSuggestions={setShowSuggestions}
-      />
+    <div className="min-h-screen bg-black text-gray-100 relative">
+      {/* Navbar with higher z-index */}
+      <div className="sticky top-0 z-50">
+        <Navbar 
+          searchQuery={searchQuery} 
+          setSearchQuery={setSearchQuery} 
+          handleSearch={handleSearch} 
+          loading={loading}
+          suggestions={suggestions}
+          showSuggestions={showSuggestions}
+          suggestionsLoading={suggestionsLoading}
+          handleSuggestionClick={handleSuggestionClick}
+          setShowSuggestions={setShowSuggestions}
+        />
+      </div>
       
-      <div className="p-4 md:p-6 max-w-7xl mx-auto">
+      {/* Main content with lower z-index */}
+      <div className="p-4 md:p-6 max-w-7xl mx-auto relative z-10">
+        {/* Hero Slider */}
+        <HeroSlider />
+
         {/* Error Message */}
         <AnimatePresence>
           {error && (
@@ -181,4 +189,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default Dashboard;
