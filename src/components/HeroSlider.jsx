@@ -3,6 +3,58 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import axios from 'axios'
 
+// Fallback data in case API fails
+const FALLBACK_BIOGRAPHIES = [
+  {
+    id: 'fallback1',
+    volumeInfo: {
+      title: "The Story of My Experiments with Truth",
+      authors: ["Mahatma Gandhi"],
+      description: "The autobiography of Mohandas Karamchand Gandhi, covering his life from early childhood through to 1921.",
+      imageLinks: {
+        thumbnail: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/My_Experiments_With_Truth.jpg/1200px-My_Experiments_With_Truth.jpg"
+      },
+      publishedDate: "1927",
+      infoLink: "https://en.wikipedia.org/wiki/The_Story_of_My_Experiments_with_Truth",
+      previewLink: "https://www.gutenberg.org/ebooks/14681"
+    }
+  },
+  {
+    id: 'fallback2',
+    volumeInfo: {
+      title: "Wings of Fire",
+      authors: ["A.P.J. Abdul Kalam"],
+      description: "An autobiography of A.P.J. Abdul Kalam, former President of India, covering his early life and career in science.",
+      imageLinks: {
+        thumbnail: "https://upload.wikimedia.org/wikipedia/en/7/7e/Wings_of_Fire_by_A_P_J_Abdul_Kalam_Book_Cover.jpg"
+      },
+      publishedDate: "1999",
+      infoLink: "https://en.wikipedia.org/wiki/Wings_of_Fire_(autobiography)",
+      previewLink: "https://books.google.com/books/about/Wings_of_Fire.html"
+    }
+  },
+  {
+    id: 'fallback3',
+    volumeInfo: {
+      title: "An Autobiography",
+      authors: ["Jawaharlal Nehru"],
+      description: "The autobiography of Jawaharlal Nehru, the first Prime Minister of independent India.",
+      imageLinks: {
+        thumbnail: "https://upload.wikimedia.org/wikipedia/en/thumb/5/5e/An_Autobiography_%28Nehru%29.jpg/220px-An_Autobiography_%28Nehru%29.jpg"
+      },
+      publishedDate: "1936",
+      infoLink: "https://en.wikipedia.org/wiki/An_Autobiography_(Nehru)",
+      previewLink: "https://books.google.com/books/about/An_Autobiography.html"
+    }
+  }
+].map(book => ({
+  ...book,
+  volumeInfo: {
+    ...book.volumeInfo,
+    thumbnail: book.volumeInfo.imageLinks.thumbnail
+  }
+}))
+
 const HeroSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [biographies, setBiographies] = useState([])
@@ -16,28 +68,33 @@ const HeroSlider = () => {
         setLoading(true)
         const queries = [
           'intitle:"autobiography of mahatma gandhi"',
-          'intitle:"subhas chandra bose autobiography"',
-          'intitle:"bhagat singh biography"',
           'intitle:"wings of fire abdul kalam"',
           'intitle:"nehru autobiography"',
-          'intitle:"sardar patel biography"',
-          'intitle:"lal bahadur shastri biography"',
-          'intitle:"rani lakshmibai biography"',
-          'intitle:"tilak biography"',
-          'intitle:"bipin chandra pal biography"',
-          'intitle:"lala lajpat rai biography"',
-          'intitle:"chandra shekhar azad biography"'
+          'intitle:"bhagat singh biography"',
+          'intitle:"sardar patel biography"'
         ]
         
-        const results = await Promise.all(
-          queries.map(query => 
-            axios.get(`https://www.googleapis.com/books/v1/volumes?q=${query}&key=${API_KEY}&maxResults=1`)
-          )
-        )
+        // Rate-limited fetching
+        const results = []
+        for (let i = 0; i < queries.length; i++) {
+          try {
+            const response = await axios.get(
+              `https://www.googleapis.com/books/v1/volumes?q=${queries[i]}&key=${API_KEY}&maxResults=1`
+            )
+            results.push(response)
+            // Add delay between requests to avoid rate limiting
+            if (i < queries.length - 1) {
+              await new Promise(resolve => setTimeout(resolve, 1000))
+            }
+          } catch (err) {
+            console.error(`Error fetching query "${queries[i]}":`, err)
+            results.push({ data: { items: [] } }) // Push empty result if query fails
+          }
+        }
         
         const validBiographies = results
           .map(res => res.data.items?.[0])
-          .filter(book => book && book.volumeInfo.imageLinks?.thumbnail)
+          .filter(book => book && book.volumeInfo?.imageLinks?.thumbnail)
           .map(book => ({
             ...book,
             volumeInfo: {
@@ -46,10 +103,17 @@ const HeroSlider = () => {
             }
           }))
           
-        setBiographies(validBiographies)
+        // Use API results if we got any, otherwise use fallback
+        if (validBiographies.length > 0) {
+          setBiographies(validBiographies)
+        } else {
+          setBiographies(FALLBACK_BIOGRAPHIES)
+          setError('Using fallback data as API requests were limited')
+        }
       } catch (err) {
-        setError('Failed to fetch biographies. Please try again later.')
         console.error('Error fetching biographies:', err)
+        setBiographies(FALLBACK_BIOGRAPHIES)
+        setError('Failed to fetch from API. Using fallback data instead.')
       } finally {
         setLoading(false)
       }
@@ -90,14 +154,14 @@ const HeroSlider = () => {
     )
   }
 
-  if (error || biographies.length === 0) {
+  if (biographies.length === 0) {
     return (
       <div className="h-[32rem] bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl mb-8 flex flex-col items-center justify-center text-center p-6">
         <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-amber-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
         <h3 className="text-2xl font-bold text-amber-100 mb-2">Oops!</h3>
-        <p className="text-gray-300 max-w-md">{error || 'We couldn\'t find any biographies at the moment.'}</p>
+        <p className="text-gray-300 max-w-md">We couldn't find any biographies at the moment.</p>
         <button 
           onClick={() => window.location.reload()}
           className="mt-6 px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-lg transition-colors"
@@ -110,6 +174,12 @@ const HeroSlider = () => {
 
   return (
     <div className="relative h-[32rem] md:h-[40rem] w-full overflow-hidden rounded-xl shadow-2xl mb-8 group">
+      {error && (
+        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-amber-500/90 text-white px-4 py-2 rounded-lg z-10 text-sm">
+          {error}
+        </div>
+      )}
+      
       {biographies.map((bio, index) => (
         <motion.div
           key={bio.id}
@@ -232,4 +302,4 @@ const HeroSlider = () => {
   )
 }
 
-export default HeroSlider;
+export default HeroSlider
