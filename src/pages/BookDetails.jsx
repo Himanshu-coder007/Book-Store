@@ -65,16 +65,16 @@ const BookDetails = () => {
     const hasHalfStar = rating % 1 >= 0.5;
     
     for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={`full-${i}`} className="text-yellow-400" />);
+      stars.push(<FaStar key={`full-${i}`} className="text-pink-500" />);
     }
     
     if (hasHalfStar) {
-      stars.push(<FaStar key="half" className="text-yellow-400 opacity-50" />);
+      stars.push(<FaStar key="half" className="text-pink-500 opacity-50" />);
     }
     
     const emptyStars = 5 - stars.length;
     for (let i = 0; i < emptyStars; i++) {
-      stars.push(<FaStar key={`empty-${i}`} className="text-gray-500" />);
+      stars.push(<FaStar key={`empty-${i}`} className="text-gray-300" />);
     }
     
     return stars;
@@ -82,11 +82,11 @@ const BookDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
+      <div className="min-h-screen flex items-center justify-center bg-pink-50">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="h-16 w-16 border-t-4 border-b-4 border-amber-500 rounded-full"
+          className="h-16 w-16 border-t-4 border-b-4 border-pink-500 rounded-full"
         ></motion.div>
       </div>
     );
@@ -94,12 +94,12 @@ const BookDetails = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
-        <div className="max-w-md p-8 bg-gray-800 rounded-xl shadow-lg text-center border border-gray-700">
-          <h2 className="text-2xl font-bold text-amber-500 mb-4">{error}</h2>
+      <div className="min-h-screen flex items-center justify-center bg-pink-50">
+        <div className="max-w-md p-8 bg-white rounded-xl shadow-lg text-center border border-pink-200">
+          <h2 className="text-2xl font-bold text-pink-600 mb-4">{error}</h2>
           <Link 
             to="/" 
-            className="inline-flex items-center px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-lg transition-colors shadow-md"
+            className="inline-flex items-center px-6 py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-lg transition-colors shadow-md"
           >
             <FaArrowLeft className="mr-2" />
             Back to Home
@@ -111,12 +111,12 @@ const BookDetails = () => {
 
   if (!book) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
-        <div className="max-w-md p-8 bg-gray-800 rounded-xl shadow-lg text-center border border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-300 mb-4">Book not found</h2>
+      <div className="min-h-screen flex items-center justify-center bg-pink-50">
+        <div className="max-w-md p-8 bg-white rounded-xl shadow-lg text-center border border-pink-200">
+          <h2 className="text-2xl font-bold text-pink-800 mb-4">Book not found</h2>
           <Link 
             to="/" 
-            className="inline-flex items-center px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-lg transition-colors shadow-md"
+            className="inline-flex items-center px-6 py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-lg transition-colors shadow-md"
           >
             <FaArrowLeft className="mr-2" />
             Back to Home
@@ -127,11 +127,11 @@ const BookDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-pink-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <Link 
           to="/" 
-          className="inline-flex items-center text-amber-400 hover:text-amber-300 mb-8 transition-colors font-medium"
+          className="inline-flex items-center text-pink-600 hover:text-pink-500 mb-8 transition-colors font-medium"
         >
           <FaArrowLeft className="mr-2" />
           Back to all books
@@ -141,11 +141,11 @@ const BookDetails = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-700"
+          className="bg-white rounded-2xl shadow-xl overflow-hidden border border-pink-200"
         >
           <div className="md:flex">
             {/* Book Cover */}
-            <div className="md:w-1/3 lg:w-1/4 p-8 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
+            <div className="md:w-1/3 lg:w-1/4 p-8 flex items-center justify-center bg-pink-100">
               {book.volumeInfo.imageLinks?.thumbnail ? (
                 <motion.div
                   className="relative w-full h-full min-h-[400px] md:min-h-[500px] flex items-center justify-center"
@@ -158,13 +158,13 @@ const BookDetails = () => {
                     className="absolute inset-0 w-full h-full object-contain drop-shadow-lg"
                     onError={(e) => {
                       e.target.src = 'https://via.placeholder.com/300x450?text=No+Cover';
-                      e.target.className = 'absolute inset-0 w-full h-full object-contain bg-gray-700';
+                      e.target.className = 'absolute inset-0 w-full h-full object-contain bg-pink-200';
                     }}
                   />
                 </motion.div>
               ) : (
-                <div className="w-full h-96 flex items-center justify-center bg-gray-700 rounded-lg">
-                  <div className="text-gray-400 text-center p-6">
+                <div className="w-full h-96 flex items-center justify-center bg-pink-200 rounded-lg">
+                  <div className="text-pink-600 text-center p-6">
                     <div className="text-4xl mb-2">📖</div>
                     <p>No cover image available</p>
                   </div>
@@ -178,11 +178,11 @@ const BookDetails = () => {
                 <div className="flex-1">
                   <div className="flex justify-between items-start gap-4">
                     <div>
-                      <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                      <h1 className="text-3xl md:text-4xl font-bold text-pink-900 mb-2">
                         {book.volumeInfo.title}
                       </h1>
                       {book.volumeInfo.subtitle && (
-                        <h2 className="text-xl md:text-2xl text-gray-300 mb-4">
+                        <h2 className="text-xl md:text-2xl text-pink-700 mb-4">
                           {book.volumeInfo.subtitle}
                         </h2>
                       )}
@@ -193,7 +193,7 @@ const BookDetails = () => {
                         whileTap={{ scale: 0.9 }}
                         onClick={handleToggleLike}
                         className={`p-3 rounded-full transition-colors ${
-                          liked ? 'bg-red-900/50 text-red-400' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                          liked ? 'bg-pink-100 text-pink-600' : 'bg-pink-50 hover:bg-pink-100 text-pink-400'
                         }`}
                         aria-label={liked ? "Unlike" : "Like"}
                       >
@@ -208,8 +208,8 @@ const BookDetails = () => {
                         onClick={handleToggleCart}
                         className={`p-3 rounded-full transition-colors ${
                           inCart 
-                            ? 'bg-amber-900/50 text-amber-300' 
-                            : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                            ? 'bg-pink-100 text-pink-600' 
+                            : 'bg-pink-50 hover:bg-pink-100 text-pink-400'
                         }`}
                         aria-label={inCart ? "Remove from cart" : "Add to cart"}
                       >
@@ -219,26 +219,26 @@ const BookDetails = () => {
                   </div>
                   
                   {book.volumeInfo.authors?.length > 0 && (
-                    <p className="text-lg text-gray-300 mb-4">
-                      <span className="font-semibold text-gray-400">By:</span> {book.volumeInfo.authors.join(', ')}
+                    <p className="text-lg text-pink-700 mb-4">
+                      <span className="font-semibold text-pink-600">By:</span> {book.volumeInfo.authors.join(', ')}
                     </p>
                   )}
                   
                   <div className="flex flex-wrap gap-3 mb-6">
                     {book.volumeInfo.publishedDate && (
-                      <div className="bg-blue-900/50 text-blue-300 px-4 py-2 rounded-full text-sm font-medium">
+                      <div className="bg-pink-100 text-pink-600 px-4 py-2 rounded-full text-sm font-medium">
                         Published: {new Date(book.volumeInfo.publishedDate).getFullYear()}
                       </div>
                     )}
                     
                     {book.volumeInfo.pageCount && (
-                      <div className="bg-purple-900/50 text-purple-300 px-4 py-2 rounded-full text-sm font-medium">
+                      <div className="bg-pink-100 text-pink-600 px-4 py-2 rounded-full text-sm font-medium">
                         {book.volumeInfo.pageCount} pages
                       </div>
                     )}
                     
                     {book.volumeInfo.averageRating && (
-                      <div className="flex items-center bg-yellow-900/50 text-yellow-300 px-4 py-2 rounded-full text-sm font-medium">
+                      <div className="flex items-center bg-pink-100 text-pink-600 px-4 py-2 rounded-full text-sm font-medium">
                         <div className="flex mr-1">
                           {renderRatingStars(book.volumeInfo.averageRating)}
                         </div>
@@ -247,13 +247,13 @@ const BookDetails = () => {
                     )}
                     
                     {book.volumeInfo.language && (
-                      <div className="bg-green-900/50 text-green-300 px-4 py-2 rounded-full text-sm font-medium">
+                      <div className="bg-pink-100 text-pink-600 px-4 py-2 rounded-full text-sm font-medium">
                         {book.volumeInfo.language.toUpperCase()}
                       </div>
                     )}
                     
                     {book.volumeInfo.categories?.length > 0 && (
-                      <div className="bg-indigo-900/50 text-indigo-300 px-4 py-2 rounded-full text-sm font-medium">
+                      <div className="bg-pink-100 text-pink-600 px-4 py-2 rounded-full text-sm font-medium">
                         {book.volumeInfo.categories[0]}
                       </div>
                     )}
@@ -261,8 +261,8 @@ const BookDetails = () => {
                   
                   {book.volumeInfo.description && (
                     <div className="mb-8">
-                      <h3 className="text-xl font-semibold text-gray-300 mb-3">Description</h3>
-                      <div className="prose prose-invert max-w-none text-gray-300">
+                      <h3 className="text-xl font-semibold text-pink-800 mb-3">Description</h3>
+                      <div className="prose max-w-none text-pink-900">
                         <div dangerouslySetInnerHTML={createMarkup(book.volumeInfo.description)} />
                       </div>
                     </div>
@@ -270,18 +270,18 @@ const BookDetails = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {book.volumeInfo.publisher && (
-                      <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
-                        <h4 className="text-sm font-semibold text-gray-400 mb-2">Publisher</h4>
-                        <p className="text-gray-200 font-medium">{book.volumeInfo.publisher}</p>
+                      <div className="bg-pink-50 p-4 rounded-lg border border-pink-200">
+                        <h4 className="text-sm font-semibold text-pink-600 mb-2">Publisher</h4>
+                        <p className="text-pink-800 font-medium">{book.volumeInfo.publisher}</p>
                       </div>
                     )}
                     
                     {book.volumeInfo.industryIdentifiers?.length > 0 && (
-                      <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600">
-                        <h4 className="text-sm font-semibold text-gray-400 mb-2">ISBN</h4>
+                      <div className="bg-pink-50 p-4 rounded-lg border border-pink-200">
+                        <h4 className="text-sm font-semibold text-pink-600 mb-2">ISBN</h4>
                         <div className="space-y-1">
                           {book.volumeInfo.industryIdentifiers.map((id, index) => (
-                            <p key={index} className="text-gray-200 font-medium">
+                            <p key={index} className="text-pink-800 font-medium">
                               {id.type}: {id.identifier}
                             </p>
                           ))}
@@ -291,14 +291,14 @@ const BookDetails = () => {
                   </div>
                 </div>
                 
-                <div className="mt-auto pt-6 border-t border-gray-700">
+                <div className="mt-auto pt-6 border-t border-pink-200">
                   <motion.a
                     whileHover={{ scale: 1.03 }}
                     whileTap={{ scale: 0.97 }}
                     href={book.volumeInfo.infoLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white rounded-lg transition-colors shadow-md font-medium"
+                    className="inline-flex items-center px-6 py-3 bg-pink-600 hover:bg-pink-500 text-white rounded-lg transition-colors shadow-md font-medium"
                   >
                     <FaExternalLinkAlt className="mr-2" />
                     View on Google Books
