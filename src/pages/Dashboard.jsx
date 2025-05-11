@@ -26,7 +26,6 @@ const Dashboard = () => {
     { id: 'biography', name: 'Biography' },
     { id: 'history', name: 'History' },
     { id: 'fantasy', name: 'Fantasy' },
-    { id: 'romance', name: 'Romance' },
     { id: 'business', name: 'Business' },
   ]
 

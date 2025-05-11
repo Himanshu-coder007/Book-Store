@@ -18,11 +18,14 @@ const Navbar = ({
   const { likedBooks } = useSelector((state) => state.likes)
   const { cartItems } = useSelector((state) => state.cart)
   const searchRef = useRef(null)
+  const userDropdownRef = useRef(null)
   const navigate = useNavigate()
   const user = JSON.parse(localStorage.getItem('user'))
+  const [showUserDropdown, setShowUserDropdown] = useState(false)
 
   const handleLogout = () => {
     localStorage.removeItem('user')
+    setShowUserDropdown(false)
     navigate('/login')
   }
 
@@ -32,13 +35,16 @@ const Navbar = ({
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setShowSuggestions(false)
       }
+      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
+        setShowUserDropdown(false)
+      }
     }
 
     document.addEventListener('mousedown', handleClickOutside)
     return () => {
       document.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [searchRef, setShowSuggestions])
+  }, [searchRef, userDropdownRef, setShowSuggestions])
 
   return (
     <nav className="bg-black shadow-sm sticky top-0 z-10">
@@ -134,28 +140,6 @@ const Navbar = ({
           </div>
           
           <div className="flex items-center space-x-4">
-            {user ? (
-              <>
-                <span className="flex items-center text-gray-300">
-                  <FaUser className="mr-1" /> {user.name}
-                </span>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center p-2 text-gray-300 hover:text-red-400 transition-colors"
-                  title="Logout"
-                >
-                  <FaSignOutAlt className="h-5 w-5" />
-                </button>
-              </>
-            ) : (
-              <Link 
-                to="/login" 
-                className="px-3 py-1 text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                Login
-              </Link>
-            )}
-            
             <Link 
               to="/likes" 
               className="relative p-2 text-gray-300 hover:text-red-400 transition-colors"
@@ -189,6 +173,48 @@ const Navbar = ({
                 </motion.span>
               )}
             </Link>
+
+            {/* User section */}
+            {user ? (
+              <div className="relative ml-2" ref={userDropdownRef}>
+                <button
+                  onClick={() => setShowUserDropdown(!showUserDropdown)}
+                  className="flex items-center space-x-1 p-2 text-gray-300 hover:text-white transition-colors"
+                >
+                  <FaUser className="h-5 w-5" />
+                  <span className="hidden md:inline">{user.name}</span>
+                </button>
+
+                <AnimatePresence>
+                  {showUserDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.2 }}
+                      className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg border border-gray-700 z-30"
+                    >
+                      <div className="py-1">
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
+                        >
+                          <FaSignOutAlt className="mr-2 h-4 w-4" />
+                          Logout
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Link 
+                to="/login" 
+                className="px-3 py-1 text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Login
+              </Link>
+            )}
           </div>
         </div>
       </div>
