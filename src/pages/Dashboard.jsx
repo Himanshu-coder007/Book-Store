@@ -6,6 +6,7 @@ import { setBooks, setLoading, setError } from '../features/books/booksSlice'
 import Navbar from '../components/Navbar'
 import BookCard from '../components/BookCard'
 import HeroSlider from '../components/HeroSlider'
+import ReviewsSection from '../components/ReviewsSection'
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -137,16 +138,21 @@ const Dashboard = () => {
 
         {/* Books Grid */}
         {!loading && books.length > 0 && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
-          >
-            {books.map((book) => (
-              <BookCard key={book.id} book={book} />
-            ))}
-          </motion.div>
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+            >
+              {books.map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))}
+            </motion.div>
+
+            {/* Reviews Section */}
+            <ReviewsSection />
+          </>
         )}
 
         {/* No Results */}
@@ -189,4 +195,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard;
+export default Dashboard
