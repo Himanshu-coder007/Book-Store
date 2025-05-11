@@ -13,20 +13,37 @@ const Dashboard = () => {
   const [suggestions, setSuggestions] = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [suggestionsLoading, setSuggestionsLoading] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState('all')
   const dispatch = useDispatch()
   
   const { books, loading, error } = useSelector((state) => state.books)
   const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
 
-  const fetchBooks = async (query = '') => {
+  const categories = [
+    { id: 'all', name: 'All Books' },
+    { id: 'fiction', name: 'Fiction' },
+    { id: 'science', name: 'Science' },
+    { id: 'biography', name: 'Biography' },
+    { id: 'history', name: 'History' },
+    { id: 'fantasy', name: 'Fantasy' },
+    { id: 'romance', name: 'Romance' },
+    { id: 'business', name: 'Business' },
+  ]
+
+  const fetchBooks = async (query = '', category = 'all') => {
     dispatch(setLoading(true))
     dispatch(setError(null))
     setShowSuggestions(false)
     
     try {
-      const url = query 
-        ? `https://www.googleapis.com/books/v1/volumes?q=${query}&key=${API_KEY}&maxResults=20`
-        : `https://www.googleapis.com/books/v1/volumes?q=subject:books&key=${API_KEY}&maxResults=20`
+      let url
+      if (query) {
+        url = `https://www.googleapis.com/books/v1/volumes?q=${query}&key=${API_KEY}&maxResults=20`
+      } else if (category !== 'all') {
+        url = `https://www.googleapis.com/books/v1/volumes?q=subject:${category}&key=${API_KEY}&maxResults=20`
+      } else {
+        url = `https://www.googleapis.com/books/v1/volumes?q=subject:books&key=${API_KEY}&maxResults=20`
+      }
       
       const response = await axios.get(url)
       dispatch(setBooks(response.data.items || []))
@@ -75,18 +92,23 @@ const Dashboard = () => {
   }, [searchQuery])
 
   useEffect(() => {
-    fetchBooks()
-  }, [])
+    fetchBooks('', selectedCategory)
+  }, [selectedCategory])
 
   const handleSearch = (e) => {
     e.preventDefault()
-    fetchBooks(searchQuery.trim())
+    fetchBooks(searchQuery.trim(), selectedCategory)
   }
 
   const handleSuggestionClick = (suggestion) => {
     setSearchQuery(suggestion.volumeInfo.title)
-    fetchBooks(suggestion.volumeInfo.title)
+    fetchBooks(suggestion.volumeInfo.title, selectedCategory)
     setShowSuggestions(false)
+  }
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category)
+    setSearchQuery('') // Reset search query when changing categories
   }
 
   return (
@@ -110,6 +132,28 @@ const Dashboard = () => {
       <div className="p-4 md:p-6 max-w-7xl mx-auto relative z-10">
         {/* Hero Slider */}
         <HeroSlider />
+
+        {/* Categories */}
+        <div className="my-8">
+          <h2 className="text-xl font-bold mb-4 text-white">Browse Categories</h2>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <motion.button
+                key={category.id}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleCategoryChange(category.id)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  selectedCategory === category.id
+                    ? 'bg-[#D68100] text-white'
+                    : 'bg-purple-800 text-gray-300 hover:bg-gray-700'
+                }`}
+              >
+                {category.name}
+              </motion.button>
+            ))}
+          </div>
+        </div>
 
         {/* Error Message */}
         <AnimatePresence>
@@ -143,11 +187,19 @@ const Dashboard = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+              className="mt-8"
             >
-              {books.map((book) => (
-                <BookCard key={book.id} book={book} />
-              ))}
+              <h2 className="text-2xl font-bold mb-6 text-white">
+                {selectedCategory === 'all' 
+                  ? 'Popular Books' 
+                  : `${categories.find(c => c.id === selectedCategory)?.name} Books`}
+              </h2>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {books.map((book) => (
+                  <BookCard key={book.id} book={book} />
+                ))}
+              </div>
             </motion.div>
 
             {/* Reviews Section */}
@@ -183,10 +235,10 @@ const Dashboard = () => {
               Try searching for something else or check your spelling.
             </p>
             <button
-              onClick={() => fetchBooks()}
+              onClick={() => fetchBooks('', selectedCategory)}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
             >
-              Show Popular Books
+              Show {selectedCategory === 'all' ? 'Popular' : categories.find(c => c.id === selectedCategory)?.name} Books
             </button>
           </motion.div>
         )}
