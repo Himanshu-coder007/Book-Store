@@ -3,8 +3,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import axios from 'axios'
 
-// Memoized fallback data
-const FALLBACK_BIOGRAPHIES = useMemo(() => [
+// Fallback data (without useMemo)
+const FALLBACK_BIOGRAPHIES = [
   {
     id: 'fallback1',
     volumeInfo: {
@@ -53,7 +53,7 @@ const FALLBACK_BIOGRAPHIES = useMemo(() => [
     ...book.volumeInfo,
     thumbnail: book.volumeInfo.imageLinks.thumbnail
   }
-})), [])
+}))
 
 const HeroSlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -61,6 +61,9 @@ const HeroSlider = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
+
+  // Memoize fallback data inside the component
+  const memoizedFallback = useMemo(() => FALLBACK_BIOGRAPHIES, [])
 
   // Memoized fetch function
   const fetchBiographies = useCallback(async () => {
@@ -107,17 +110,17 @@ const HeroSlider = () => {
       if (validBiographies.length > 0) {
         setBiographies(validBiographies)
       } else {
-        setBiographies(FALLBACK_BIOGRAPHIES)
+        setBiographies(memoizedFallback)
         setError('Using fallback data as API requests were limited')
       }
     } catch (err) {
       console.error('Error fetching biographies:', err)
-      setBiographies(FALLBACK_BIOGRAPHIES)
+      setBiographies(memoizedFallback)
       setError('Failed to fetch from API. Using fallback data instead.')
     } finally {
       setLoading(false)
     }
-  }, [API_KEY])
+  }, [API_KEY, memoizedFallback])
 
   useEffect(() => {
     // Only fetch if we haven't loaded anything yet
@@ -210,7 +213,7 @@ const HeroSlider = () => {
                   scale: 1,
                   transition: { delay: 0.2, duration: 0.5 }
                 }}
-                loading="lazy" // Add lazy loading
+                loading="lazy"
               />
               <div className="absolute -bottom-4 -right-4 bg-amber-600 text-white px-3 py-1 rounded-lg shadow-lg text-sm font-medium">
                 {bio.volumeInfo.publishedDate?.substring(0,4) || 'Year N/A'}
