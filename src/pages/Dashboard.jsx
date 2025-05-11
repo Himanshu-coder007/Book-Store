@@ -111,7 +111,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-gray-100 relative">
+    <div className="min-h-screen bg-[#1B2838] text-gray-100 relative">
       {/* Navbar with higher z-index */}
       <div className="sticky top-0 z-50">
         <Navbar 

@@ -47,7 +47,7 @@ const Navbar = ({
   }, [searchRef, userDropdownRef, setShowSuggestions])
 
   return (
-    <nav className="bg-black shadow-sm sticky top-0 z-10">
+    <nav className="bg-[#1B2838] shadow-sm sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
