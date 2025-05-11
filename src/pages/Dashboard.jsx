@@ -111,7 +111,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#1B2838] text-gray-100 relative">
+    <div className="min-h-screen bg-[#fff5f7] text-gray-800 relative">
       {/* Navbar with higher z-index */}
       <div className="sticky top-0 z-50">
         <Navbar 
@@ -134,7 +134,7 @@ const Dashboard = () => {
 
         {/* Categories */}
         <div className="my-8">
-          <h2 className="text-xl font-bold mb-4 text-white">Browse Categories</h2>
+          <h2 className="text-xl font-bold mb-4 text-pink-800">Browse Categories</h2>
           <div className="flex flex-wrap gap-2">
             {categories.map((category) => (
               <motion.button
@@ -144,8 +144,8 @@ const Dashboard = () => {
                 onClick={() => handleCategoryChange(category.id)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   selectedCategory === category.id
-                    ? 'bg-[#D68100] text-white'
-                    : 'bg-purple-800 text-gray-300 hover:bg-gray-700'
+                    ? 'bg-pink-600 text-white'
+                    : 'bg-pink-100 text-pink-800 hover:bg-pink-200'
                 }`}
               >
                 {category.name}
@@ -161,7 +161,7 @@ const Dashboard = () => {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="p-4 mb-6 bg-red-900/80 border border-red-700 text-red-100 rounded-lg shadow-sm"
+              className="p-4 mb-6 bg-red-200 border border-red-400 text-red-800 rounded-lg shadow-sm"
             >
               {error}
             </motion.div>
@@ -174,7 +174,7 @@ const Dashboard = () => {
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="h-16 w-16 border-t-4 border-b-4 border-blue-500 rounded-full"
+              className="h-16 w-16 border-t-4 border-b-4 border-pink-500 rounded-full"
             ></motion.div>
           </div>
         )}
@@ -188,7 +188,7 @@ const Dashboard = () => {
               transition={{ duration: 0.5 }}
               className="mt-8"
             >
-              <h2 className="text-2xl font-bold mb-6 text-white">
+              <h2 className="text-2xl font-bold mb-6 text-pink-800">
                 {selectedCategory === 'all' 
                   ? 'Popular Books' 
                   : `${categories.find(c => c.id === selectedCategory)?.name} Books`}
@@ -213,9 +213,9 @@ const Dashboard = () => {
             animate={{ opacity: 1 }}
             className="text-center py-16"
           >
-            <div className="inline-block p-6 bg-gray-900 rounded-xl shadow-sm mb-4">
+            <div className="inline-block p-6 bg-pink-50 rounded-xl shadow-sm mb-4">
               <svg
-                className="w-16 h-16 mx-auto text-gray-400"
+                className="w-16 h-16 mx-auto text-pink-400"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -229,13 +229,13 @@ const Dashboard = () => {
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-200 mb-2">No books found</h3>
-            <p className="text-gray-400 max-w-md mx-auto">
+            <h3 className="text-lg font-medium text-pink-800 mb-2">No books found</h3>
+            <p className="text-pink-600 max-w-md mx-auto">
               Try searching for something else or check your spelling.
             </p>
             <button
               onClick={() => fetchBooks('', selectedCategory)}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
+              className="mt-4 px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-500 transition-colors"
             >
               Show {selectedCategory === 'all' ? 'Popular' : categories.find(c => c.id === selectedCategory)?.name} Books
             </button>

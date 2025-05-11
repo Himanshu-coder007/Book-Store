@@ -47,15 +47,15 @@ const Navbar = ({
   }, [searchRef, userDropdownRef, setShowSuggestions])
 
   return (
-    <nav className="bg-[#1B2838] shadow-sm sticky top-0 z-10">
+    <nav className="bg-pink-50 shadow-sm sticky top-0 z-10 border-b border-pink-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           <div className="flex items-center">
             <Link 
               to="/" 
-              className="flex items-center text-xl font-bold text-white hover:text-gray-300 transition-colors"
+              className="flex items-center text-xl font-bold text-pink-800 hover:text-pink-600 transition-colors"
             >
-              <FaBook className="mr-2 text-blue-400" />
+              <FaBook className="mr-2 text-pink-500" />
               BookStore
             </Link>
           </div>
@@ -74,11 +74,11 @@ const Navbar = ({
                 }}
                 onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
                 placeholder="Search for books..."
-                className="flex-1 px-4 py-2 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm transition-all duration-300 w-full bg-gray-800 text-white placeholder-gray-400"
+                className="flex-1 px-4 py-2 border border-pink-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 shadow-sm transition-all duration-300 w-full bg-white text-pink-900 placeholder-pink-400"
               />
               <button
                 type="submit"
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg"
+                className="px-4 py-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-lg hover:from-pink-600 hover:to-rose-600 transition-all duration-300 flex items-center gap-2 shadow-md hover:shadow-lg"
                 disabled={loading}
               >
                 <FaSearch />
@@ -93,18 +93,18 @@ const Navbar = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
-                  className="absolute z-20 mt-1 w-full bg-gray-800 rounded-lg shadow-lg border border-gray-700 max-h-80 overflow-y-auto"
+                  className="absolute z-20 mt-1 w-full bg-white rounded-lg shadow-lg border border-pink-200 max-h-80 overflow-y-auto"
                 >
                   {suggestionsLoading ? (
                     <div className="p-4 flex justify-center">
-                      <FaSpinner className="animate-spin text-blue-400" />
+                      <FaSpinner className="animate-spin text-pink-500" />
                     </div>
                   ) : suggestions.length > 0 ? (
                     <ul>
                       {suggestions.map((suggestion) => (
                         <li 
                           key={suggestion.id}
-                          className="px-4 py-3 hover:bg-gray-700 cursor-pointer border-b border-gray-700 last:border-b-0 transition-colors"
+                          className="px-4 py-3 hover:bg-pink-50 cursor-pointer border-b border-pink-100 last:border-b-0 transition-colors"
                           onClick={() => handleSuggestionClick(suggestion)}
                         >
                           <div className="flex items-center">
@@ -116,11 +116,11 @@ const Navbar = ({
                               />
                             )}
                             <div>
-                              <p className="font-medium text-white line-clamp-1">
+                              <p className="font-medium text-pink-900 line-clamp-1">
                                 {suggestion.volumeInfo.title}
                               </p>
                               {suggestion.volumeInfo.authors && (
-                                <p className="text-xs text-gray-400 line-clamp-1">
+                                <p className="text-xs text-pink-600 line-clamp-1">
                                   {suggestion.volumeInfo.authors.join(', ')}
                                 </p>
                               )}
@@ -130,7 +130,7 @@ const Navbar = ({
                       ))}
                     </ul>
                   ) : (
-                    <div className="p-4 text-gray-400 text-center">
+                    <div className="p-4 text-pink-600 text-center">
                       No suggestions found
                     </div>
                   )}
@@ -142,7 +142,7 @@ const Navbar = ({
           <div className="flex items-center space-x-4">
             <Link 
               to="/likes" 
-              className="relative p-2 text-gray-300 hover:text-red-400 transition-colors"
+              className="relative p-2 text-pink-700 hover:text-pink-500 transition-colors"
               title="Favorites"
             >
               <FaHeart className="h-5 w-5" />
@@ -150,7 +150,7 @@ const Navbar = ({
                 <motion.span 
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                  className="absolute -top-1 -right-1 bg-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
                 >
                   {likedBooks.length}
                 </motion.span>
@@ -159,7 +159,7 @@ const Navbar = ({
             
             <Link 
               to="/cart" 
-              className="relative p-2 text-gray-300 hover:text-green-400 transition-colors"
+              className="relative p-2 text-pink-700 hover:text-pink-500 transition-colors"
               title="Cart"
             >
               <FaShoppingCart className="h-5 w-5" />
@@ -167,7 +167,7 @@ const Navbar = ({
                 <motion.span 
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                  className="absolute -top-1 -right-1 bg-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
                 >
                   {cartItems.length}
                 </motion.span>
@@ -179,7 +179,7 @@ const Navbar = ({
               <div className="relative ml-2" ref={userDropdownRef}>
                 <button
                   onClick={() => setShowUserDropdown(!showUserDropdown)}
-                  className="flex items-center space-x-1 p-2 text-gray-300 hover:text-white transition-colors"
+                  className="flex items-center space-x-1 p-2 text-pink-700 hover:text-pink-500 transition-colors"
                 >
                   <FaUser className="h-5 w-5" />
                   <span className="hidden md:inline">{user.name}</span>
@@ -192,12 +192,12 @@ const Navbar = ({
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -10 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg border border-gray-700 z-30"
+                      className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-pink-200 z-30"
                     >
                       <div className="py-1">
                         <button
                           onClick={handleLogout}
-                          className="flex items-center w-full px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors"
+                          className="flex items-center w-full px-4 py-2 text-sm text-pink-700 hover:bg-pink-50 transition-colors"
                         >
                           <FaSignOutAlt className="mr-2 h-4 w-4" />
                           Logout
@@ -210,7 +210,7 @@ const Navbar = ({
             ) : (
               <Link 
                 to="/login" 
-                className="px-3 py-1 text-blue-400 hover:text-blue-300 transition-colors"
+                className="px-3 py-1 text-pink-600 hover:text-pink-400 transition-colors"
               >
                 Login
               </Link>

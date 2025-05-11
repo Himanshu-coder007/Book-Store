@@ -41,7 +41,7 @@ const ReviewsSection = () => {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
         viewport={{ once: true }}
-        className="text-2xl font-bold text-gray-100 mb-8 flex items-center gap-3"
+        className="text-2xl font-bold text-pink-800 mb-8 flex items-center gap-3"
       >
         <span className="h-1 w-12 bg-blue-500 rounded-full"></span>
         Recent Community Reviews
