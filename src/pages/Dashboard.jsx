@@ -16,7 +16,7 @@ const Dashboard = () => {
   const [suggestionsLoading, setSuggestionsLoading] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const dispatch = useDispatch()
-  const booksGridRef = useRef(null)
+  const categoriesRef = useRef(null)
   
   const { books, loading, error } = useSelector((state) => state.books)
   const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
@@ -112,8 +112,8 @@ const Dashboard = () => {
     setSearchQuery('') // Reset search query when changing categories
   }
 
-  const scrollToBooks = () => {
-    booksGridRef.current?.scrollIntoView({ behavior: 'smooth' })
+  const scrollToCategories = () => {
+    categoriesRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
   return (
@@ -160,7 +160,7 @@ const Dashboard = () => {
               transition={{ duration: 0.5, delay: 0.4 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={scrollToBooks}
+              onClick={scrollToCategories}
               className="flex items-center gap-2 px-8 py-4 bg-pink-600 text-white rounded-lg shadow-md hover:bg-pink-700 transition-all text-lg"
             >
               Get Started
@@ -186,7 +186,7 @@ const Dashboard = () => {
         <HeroSlider />
 
         {/* Categories */}
-        <div className="my-8">
+        <div ref={categoriesRef} className="my-8">
           <h2 className="text-2xl font-bold mb-6 text-pink-800">Browse Categories</h2>
           <div className="flex flex-wrap gap-3">
             {categories.map((category) => (
@@ -233,33 +233,31 @@ const Dashboard = () => {
         )}
 
         {/* Books Grid */}
-        <div ref={booksGridRef}>
-          {!loading && books.length > 0 && (
-            <>
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.5 }}
-                className="mt-8"
-              >
-                <h2 className="text-2xl font-bold mb-6 text-pink-800">
-                  {selectedCategory === 'all' 
-                    ? 'Popular Books' 
-                    : `${categories.find(c => c.id === selectedCategory)?.name} Books`}
-                </h2>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                  {books.map((book) => (
-                    <BookCard key={book.id} book={book} />
-                  ))}
-                </div>
-              </motion.div>
+        {!loading && books.length > 0 && (
+          <>
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="mt-8"
+            >
+              <h2 className="text-2xl font-bold mb-6 text-pink-800">
+                {selectedCategory === 'all' 
+                  ? 'Popular Books' 
+                  : `${categories.find(c => c.id === selectedCategory)?.name} Books`}
+              </h2>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {books.map((book) => (
+                  <BookCard key={book.id} book={book} />
+                ))}
+              </div>
+            </motion.div>
 
-              {/* Reviews Section */}
-              <ReviewsSection />
-            </>
-          )}
-        </div>
+            {/* Reviews Section */}
+            <ReviewsSection />
+          </>
+        )}
 
         {/* No Results */}
         {!loading && books.length === 0 && !error && (
