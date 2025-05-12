@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { FaHeart, FaShoppingCart, FaBook, FaSearch, FaSpinner, FaUser, FaSignOutAlt } from 'react-icons/fa'
-import { useSelector } from 'react-redux'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
+import { FaHeart, FaShoppingCart, FaBook, FaSearch, FaSpinner, FaUser } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = ({ 
   searchQuery, 
@@ -15,36 +15,23 @@ const Navbar = ({
   handleSuggestionClick,
   setShowSuggestions
 }) => {
-  const { likedBooks } = useSelector((state) => state.likes)
-  const { cartItems } = useSelector((state) => state.cart)
-  const searchRef = useRef(null)
-  const userDropdownRef = useRef(null)
-  const navigate = useNavigate()
-  const user = JSON.parse(localStorage.getItem('user'))
-  const [showUserDropdown, setShowUserDropdown] = useState(false)
-
-  const handleLogout = () => {
-    localStorage.removeItem('user')
-    setShowUserDropdown(false)
-    navigate('/login')
-  }
+  const { likedBooks } = useSelector((state) => state.likes);
+  const { cartItems } = useSelector((state) => state.cart);
+  const searchRef = useRef(null);
 
   // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setShowSuggestions(false)
+        setShowSuggestions(false);
       }
-      if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
-        setShowUserDropdown(false)
-      }
-    }
+    };
 
-    document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [searchRef, userDropdownRef, setShowSuggestions])
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [setShowSuggestions]);
 
   return (
     <nav className="bg-pink-50 shadow-sm sticky top-0 z-10 border-b border-pink-200">
@@ -67,9 +54,9 @@ const Navbar = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => {
-                  setSearchQuery(e.target.value)
+                  setSearchQuery(e.target.value);
                   if (e.target.value.trim()) {
-                    setShowSuggestions(true)
+                    setShowSuggestions(true);
                   }
                 }}
                 onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
@@ -174,52 +161,15 @@ const Navbar = ({
               )}
             </Link>
 
-            {/* User section */}
-            {user ? (
-              <div className="relative ml-2" ref={userDropdownRef}>
-                <button
-                  onClick={() => setShowUserDropdown(!showUserDropdown)}
-                  className="flex items-center space-x-1 p-2 text-pink-700 hover:text-pink-500 transition-colors"
-                >
-                  <FaUser className="h-5 w-5" />
-                  <span className="hidden md:inline">{user.name}</span>
-                </button>
-
-                <AnimatePresence>
-                  {showUserDropdown && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-pink-200 z-30"
-                    >
-                      <div className="py-1">
-                        <button
-                          onClick={handleLogout}
-                          className="flex items-center w-full px-4 py-2 text-sm text-pink-700 hover:bg-pink-50 transition-colors"
-                        >
-                          <FaSignOutAlt className="mr-2 h-4 w-4" />
-                          Logout
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ) : (
-              <Link 
-                to="/login" 
-                className="px-3 py-1 text-pink-600 hover:text-pink-400 transition-colors"
-              >
-                Login
-              </Link>
-            )}
+            {/* Simple User Icon */}
+            <div className="p-2 text-pink-700" title="User">
+              <FaUser className="h-5 w-5" />
+            </div>
           </div>
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;
