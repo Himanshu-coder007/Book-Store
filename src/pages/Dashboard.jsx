@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -7,6 +7,7 @@ import Navbar from '../components/Navbar'
 import BookCard from '../components/BookCard'
 import HeroSlider from '../components/HeroSlider'
 import ReviewsSection from '../components/ReviewsSection'
+import { FiArrowRight } from 'react-icons/fi'
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState('')
@@ -15,6 +16,7 @@ const Dashboard = () => {
   const [suggestionsLoading, setSuggestionsLoading] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('all')
   const dispatch = useDispatch()
+  const booksGridRef = useRef(null)
   
   const { books, loading, error } = useSelector((state) => state.books)
   const API_KEY = import.meta.env.VITE_GOOGLE_BOOKS_API_KEY
@@ -110,6 +112,10 @@ const Dashboard = () => {
     setSearchQuery('') // Reset search query when changing categories
   }
 
+  const scrollToBooks = () => {
+    booksGridRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <div className="min-h-screen bg-[#fff5f7] text-gray-800 relative">
       {/* Navbar with higher z-index */}
@@ -129,20 +135,67 @@ const Dashboard = () => {
       
       {/* Main content with lower z-index */}
       <div className="p-4 md:p-6 max-w-7xl mx-auto relative z-10">
-        {/* Hero Slider */}
+        {/* Hero Section with Image and Text - Increased height */}
+        <section className="flex flex-col md:flex-row items-center justify-between gap-8 my-8 md:my-12 min-h-[70vh]">
+          <div className="md:w-1/2 space-y-6">
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="text-4xl md:text-6xl font-bold text-pink-800 leading-tight"
+            >
+              Find Yourself in a <span className="text-pink-600">Great Book</span>
+            </motion.h1>
+            <motion.p 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-xl text-gray-600"
+            >
+              Discover your next favorite read from our extensive collection of books across all genres.
+            </motion.p>
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={scrollToBooks}
+              className="flex items-center gap-2 px-8 py-4 bg-pink-600 text-white rounded-lg shadow-md hover:bg-pink-700 transition-all text-lg"
+            >
+              Get Started
+              <FiArrowRight className="w-5 h-5" />
+            </motion.button>
+          </div>
+          
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="md:w-1/2 flex justify-center h-full"
+          >
+            <img 
+              src="/hero image.png" 
+              alt="Person reading a book" 
+              className="w-full max-w-lg rounded-lg shadow-xl object-contain h-full"
+            />
+          </motion.div>
+        </section>
+
+        {/* Hero Slider - kept below the hero section */}
         <HeroSlider />
 
         {/* Categories */}
         <div className="my-8">
-          <h2 className="text-xl font-bold mb-4 text-pink-800">Browse Categories</h2>
-          <div className="flex flex-wrap gap-2">
+          <h2 className="text-2xl font-bold mb-6 text-pink-800">Browse Categories</h2>
+          <div className="flex flex-wrap gap-3">
             {categories.map((category) => (
               <motion.button
                 key={category.id}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleCategoryChange(category.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`px-6 py-3 rounded-full text-sm font-medium transition-colors ${
                   selectedCategory === category.id
                     ? 'bg-pink-600 text-white'
                     : 'bg-pink-100 text-pink-800 hover:bg-pink-200'
@@ -180,31 +233,33 @@ const Dashboard = () => {
         )}
 
         {/* Books Grid */}
-        {!loading && books.length > 0 && (
-          <>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="mt-8"
-            >
-              <h2 className="text-2xl font-bold mb-6 text-pink-800">
-                {selectedCategory === 'all' 
-                  ? 'Popular Books' 
-                  : `${categories.find(c => c.id === selectedCategory)?.name} Books`}
-              </h2>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                {books.map((book) => (
-                  <BookCard key={book.id} book={book} />
-                ))}
-              </div>
-            </motion.div>
+        <div ref={booksGridRef}>
+          {!loading && books.length > 0 && (
+            <>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="mt-8"
+              >
+                <h2 className="text-2xl font-bold mb-6 text-pink-800">
+                  {selectedCategory === 'all' 
+                    ? 'Popular Books' 
+                    : `${categories.find(c => c.id === selectedCategory)?.name} Books`}
+                </h2>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                  {books.map((book) => (
+                    <BookCard key={book.id} book={book} />
+                  ))}
+                </div>
+              </motion.div>
 
-            {/* Reviews Section */}
-            <ReviewsSection />
-          </>
-        )}
+              {/* Reviews Section */}
+              <ReviewsSection />
+            </>
+          )}
+        </div>
 
         {/* No Results */}
         {!loading && books.length === 0 && !error && (
