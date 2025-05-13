@@ -7,6 +7,7 @@ import Navbar from '../components/Navbar'
 import BookCard from '../components/BookCard'
 import HeroSlider from '../components/HeroSlider'
 import ReviewsSection from '../components/ReviewsSection'
+import Footer from '../components/Footer'
 import { FiArrowRight } from 'react-icons/fi'
 
 const Dashboard = () => {
@@ -109,7 +110,7 @@ const Dashboard = () => {
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category)
-    setSearchQuery('') // Reset search query when changing categories
+    setSearchQuery('')
   }
 
   const scrollToCategories = () => {
@@ -182,7 +183,7 @@ const Dashboard = () => {
           </motion.div>
         </section>
 
-        {/* Hero Slider - kept below the hero section */}
+        {/* Hero Slider */}
         <HeroSlider />
 
         {/* Categories */}
@@ -295,6 +296,9 @@ const Dashboard = () => {
           </motion.div>
         )}
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }
